@@ -1,0 +1,164 @@
+/* Folio blocks. Every colour and size comes from a --folio-* variable, which falls back to the
+   host site's --cz-* token and then to a plain value, so Folio works on its own and matches
+   the site it sits in. Light only, like the site. */
+.folio {
+	--folio-text: var(--cz-text, #1d1d1f);
+	--folio-text-muted: var(--cz-text-muted, #636b78);
+	--folio-surface: var(--cz-surface, #fff);
+	--folio-fill: var(--cz-bg-2, #f5f5f7);
+	--folio-border: var(--cz-border, #e0e0e0);
+	--folio-border-strong: var(--cz-border-strong, #c8c8c8);
+	--folio-link: var(--cz-link, #006ad5);
+	--folio-live: var(--cz-green-solid, #137a3f);
+	--folio-on-live: var(--cz-on-dark, #fff);
+	--folio-expected-fill: var(--cz-blue-lt, #e8f1fc);
+	--folio-expected-text: var(--cz-link, #006ad5);
+	--folio-radius: var(--cz-radius, 10px);
+	--folio-radius-pill: var(--cz-radius-pill, 999px);
+
+	margin: 1.75rem 0;
+	color: var(--folio-text);
+}
+
+/* Sale calendar */
+.folio-salecal__table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	border: 1px solid var(--folio-border);
+	border-radius: var(--folio-radius);
+	overflow: hidden;
+	background: var(--folio-surface);
+	font-size: 0.95rem;
+	line-height: 1.45;
+}
+
+.folio-salecal__table th,
+.folio-salecal__table td {
+	padding: 0.85rem 1rem;
+	text-align: left;
+	vertical-align: top;
+	border-top: 1px solid var(--folio-border);
+}
+
+.folio-salecal__table thead th {
+	border-top: 0;
+	border-bottom: 1px solid var(--folio-border-strong);
+	background: var(--folio-fill);
+	color: var(--folio-text-muted);
+	font-size: 0.78rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.folio-salecal__table thead + tbody tr:first-child > * {
+	border-top: 0;
+}
+
+.folio-salecal__sale {
+	font-weight: 600;
+}
+
+.folio-salecal__sale a {
+	color: var(--folio-link);
+	text-decoration: none;
+}
+
+.folio-salecal__sale a:hover {
+	text-decoration: underline;
+}
+
+.folio-salecal__best {
+	display: block;
+	margin-top: 0.15rem;
+	color: var(--folio-text-muted);
+	font-size: 0.85rem;
+	font-weight: 400;
+}
+
+.folio-salecal__row.is-live {
+	background: color-mix(in srgb, var(--folio-live) 6%, var(--folio-surface));
+}
+
+.folio-status {
+	display: inline-block;
+	padding: 0.2rem 0.65rem;
+	border-radius: var(--folio-radius-pill);
+	font-size: 0.8rem;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.folio-status--live {
+	background: var(--folio-live);
+	color: var(--folio-on-live);
+}
+
+.folio-status--expected {
+	background: var(--folio-expected-fill);
+	color: var(--folio-expected-text);
+}
+
+.folio-status--none {
+	background: var(--folio-fill);
+	color: var(--folio-text-muted);
+}
+
+/* Phones: one card per sale, labels beside the values, no sideways scroll. */
+@media (max-width: 640px) {
+	.folio-salecal__table,
+	.folio-salecal__table tbody,
+	.folio-salecal__table tr,
+	.folio-salecal__table th,
+	.folio-salecal__table td {
+		display: block;
+		width: auto;
+	}
+
+	.folio-salecal__table {
+		border: 0;
+		background: none;
+	}
+
+	.folio-salecal__table thead {
+		display: none;
+	}
+
+	.folio-salecal__row {
+		margin-bottom: 0.75rem;
+		border: 1px solid var(--folio-border);
+		border-radius: var(--folio-radius);
+		background: var(--folio-surface);
+		overflow: hidden;
+	}
+
+	.folio-salecal__table .folio-salecal__row > * {
+		border-top: 0;
+	}
+
+	.folio-salecal__table .folio-salecal__sale {
+		padding-bottom: 0.4rem;
+	}
+
+	.folio-salecal__table td {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.4rem 1rem;
+	}
+
+	.folio-salecal__table td:last-child {
+		padding-bottom: 0.85rem;
+	}
+
+	.folio-salecal__table td::before {
+		content: attr(data-label);
+		color: var(--folio-text-muted);
+		font-size: 0.85rem;
+	}
+
+	.folio-salecal__table td {
+		text-align: right;
+	}
+}

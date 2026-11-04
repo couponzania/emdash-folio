@@ -1,0 +1,16 @@
+{
+  "name": "emdash-folio",
+  "version": "0.1.0",
+  "description": "Article blocks for EmDash: editor blocks with fields, rendered on the server.",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": "./src/index.ts",
+    "./blocks": "./src/blocks.ts"
+  },
+  "peerDependencies": {
+    "astro": ">=7.3.0",
+    "emdash": ">=1.4.0"
+  }
+}

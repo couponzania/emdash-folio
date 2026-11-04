@@ -1,0 +1,49 @@
+---
+// The sale calendar block on the page: a table on wide screens, one card per sale on phones.
+// "Today" is the site's own calendar day (EmDash's timezone setting), so a sale turns Live
+// and rolls to next year on the right date wherever the visitor is. Pages are cached for up
+// to a day, so a status can lag by that much.
+import { getSiteSetting } from "emdash";
+
+import "../styles/folio.css";
+import { saleCalendarRows, todayIn } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const timeZone = (await getSiteSetting("timezone")) || "UTC";
+const rows = saleCalendarRows(Astro.props.node, todayIn(timeZone));
+---
+
+{
+	rows.length > 0 && (
+		<div class="folio folio-salecal">
+			<table class="folio-salecal__table">
+				<thead>
+					<tr>
+						<th scope="col">Sale</th>
+						<th scope="col">Usually runs</th>
+						<th scope="col">Next dates</th>
+						<th scope="col">Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					{rows.map((row) => (
+						<tr class:list={["folio-salecal__row", `is-${row.status}`]}>
+							<th scope="row" class="folio-salecal__sale">
+								{row.href ? <a href={row.href}>{row.name}</a> : row.name}
+								{row.bestFor && <span class="folio-salecal__best">{row.bestFor}</span>}
+							</th>
+							<td data-label="Usually runs">{row.usual}</td>
+							<td data-label="Next dates">{row.next}</td>
+							<td data-label="Status">
+								<span class:list={["folio-status", `folio-status--${row.status}`]}>{row.statusLabel}</span>
+							</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	)
+}
