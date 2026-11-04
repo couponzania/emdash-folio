@@ -2,6 +2,11 @@
 
 Every change to Folio gets an entry and a version bump (semver). Version lives in `package.json` and `FOLIO_VERSION` in `src/index.ts`; keep them equal.
 
+## 0.3.0 (2026-11-05)
+
+- **Chart** block (`folioChart`): bar, line and donut charts from pasted data (CSV, tabs from a spreadsheet, or semicolons), drawn on the server with Folio's own code, no chart library. Bars are HTML rows (labels never shrink on phones); a line is an SVG plot stretched to its box with HTML axis labels and points over it; a donut is SVG arcs from fixed geometry with the largest share in the centre. Every chart has its description for screen readers, a data table, an optional note and a linked source. A chart that can't be drawn shows why (missing column, a value that isn't a number, a negative bar, more than six slices).
+- Series colours: the brand blue, then Okabe and Ito's colour-blind-safe palette (`--folio-series-1` to `-6`).
+
 ## 0.2.0 (2026-11-05)
 
 - **Review snapshot** block (`folioSnapshot`): the verdict card at the top of a review, with what is reviewed and its type, the verdict, an overall score out of 10 (or the average of the score rows when left blank), key stats, score rows with bars, "Skip it if", the checked date with a note, and up to two links. Server rendered; stacks on phones.

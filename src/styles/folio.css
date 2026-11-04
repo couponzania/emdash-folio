@@ -24,6 +24,13 @@
 	--folio-radius: var(--cz-radius, 10px);
 	--folio-radius-lg: var(--cz-radius-lg, 16px);
 	--folio-radius-pill: var(--cz-radius-pill, 999px);
+	/* Chart series: the brand blue, then Okabe and Ito's colour-blind-safe palette. */
+	--folio-series-1: var(--cz-blue, #0071e3);
+	--folio-series-2: #e69f00;
+	--folio-series-3: #009e73;
+	--folio-series-4: #d55e00;
+	--folio-series-5: #cc79a7;
+	--folio-series-6: #6b7280;
 
 	margin: 1.75rem 0;
 	color: var(--folio-text);
@@ -395,5 +402,389 @@
 	.folio .folio-snap__cta {
 		width: 100%;
 		text-align: center;
+	}
+}
+
+/* Charts */
+.folio .folio-swatch,
+.folio .folio-bars__fill,
+.folio .folio-line__dot {
+	--folio-c: var(--folio-series-1);
+}
+
+.folio [data-slot="2"] {
+	--folio-c: var(--folio-series-2);
+}
+
+.folio [data-slot="3"] {
+	--folio-c: var(--folio-series-3);
+}
+
+.folio [data-slot="4"] {
+	--folio-c: var(--folio-series-4);
+}
+
+.folio [data-slot="5"] {
+	--folio-c: var(--folio-series-5);
+}
+
+.folio [data-slot="6"] {
+	--folio-c: var(--folio-series-6);
+}
+
+.folio.folio-chart {
+	padding: 1.25rem 1.25rem 1rem;
+	border: 1px solid var(--folio-border);
+	border-radius: var(--folio-radius-lg);
+	background: var(--folio-surface);
+}
+
+.folio .folio-chart__title {
+	margin: 0 0 0.9rem;
+	font-size: 1.02rem;
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+.folio .folio-chart__legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem 1rem;
+	margin: 0 0 0.9rem;
+	padding: 0;
+	list-style: none;
+	color: var(--folio-text-2);
+	font-size: 0.85rem;
+}
+
+.folio .folio-chart__legend li {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin: 0;
+	padding: 0;
+}
+
+.folio .folio-swatch {
+	flex: none;
+	width: 0.75rem;
+	height: 0.75rem;
+	border-radius: 3px;
+	background: var(--folio-c);
+}
+
+/* Bars */
+.folio .folio-bars {
+	display: grid;
+	gap: 0.55rem;
+}
+
+.folio .folio-bars__row {
+	display: grid;
+	grid-template-columns: minmax(6rem, 30%) 1fr;
+	align-items: center;
+	gap: 0.85rem;
+	font-size: 0.9rem;
+}
+
+.folio .folio-bars__label {
+	overflow-wrap: anywhere;
+	color: var(--folio-text-2);
+}
+
+.folio .folio-bars__set {
+	display: grid;
+	gap: 0.2rem;
+}
+
+.folio .folio-bars__bar {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 0;
+}
+
+.folio .folio-bars__fill {
+	flex: none;
+	width: calc(var(--folio-to, 0%) * 0.78);
+	min-width: 2px;
+	height: 1.15rem;
+	border-radius: 0 4px 4px 0;
+	background: var(--folio-c);
+}
+
+.folio .folio-bars__val {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+/* Line */
+.folio .folio-line {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: 15rem auto;
+	column-gap: 0.6rem;
+}
+
+.folio .folio-line__unit {
+	margin: 0 0 0.5rem;
+	color: var(--folio-text-muted);
+	font-size: 0.78rem;
+}
+
+.folio .folio-line__y {
+	position: relative;
+	min-width: 2rem;
+}
+
+.folio .folio-line__y span {
+	position: absolute;
+	right: 0;
+	transform: translateY(-50%);
+	color: var(--folio-text-muted);
+	font-size: 0.78rem;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.folio .folio-line__plot {
+	position: relative;
+}
+
+.folio .folio-line__plot svg {
+	display: block;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+.folio .folio-line__grid {
+	stroke: var(--folio-border);
+	stroke-width: 1;
+}
+
+.folio .folio-line__path {
+	fill: none;
+	stroke: var(--folio-series-1);
+	stroke-width: 2.5;
+	stroke-linejoin: round;
+	stroke-linecap: round;
+}
+
+.folio .folio-line__path[data-slot="2"] {
+	stroke: var(--folio-series-2);
+}
+
+.folio .folio-line__path[data-slot="3"] {
+	stroke: var(--folio-series-3);
+}
+
+.folio .folio-line__path[data-slot="4"] {
+	stroke: var(--folio-series-4);
+}
+
+.folio .folio-line__path[data-slot="5"] {
+	stroke: var(--folio-series-5);
+}
+
+.folio .folio-line__path[data-slot="6"] {
+	stroke: var(--folio-series-6);
+}
+
+.folio .folio-line__dot {
+	position: absolute;
+	width: 0.55rem;
+	height: 0.55rem;
+	border: 2px solid var(--folio-surface);
+	border-radius: 50%;
+	background: var(--folio-c);
+	transform: translate(-50%, -50%);
+}
+
+.folio .folio-line__x {
+	position: relative;
+	grid-column: 2;
+	height: 1.6rem;
+}
+
+.folio .folio-line__x span {
+	position: absolute;
+	top: 0.4rem;
+	transform: translateX(-50%);
+	color: var(--folio-text-muted);
+	font-size: 0.78rem;
+	white-space: nowrap;
+}
+
+.folio .folio-line__x span:first-child {
+	transform: none;
+}
+
+.folio .folio-line__x span:last-child {
+	transform: translateX(-100%);
+}
+
+/* Donut */
+.folio .folio-donut {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1.25rem 2rem;
+}
+
+.folio .folio-donut__ring {
+	flex: none;
+	width: 11rem;
+	height: 11rem;
+}
+
+.folio .folio-donut__ring path {
+	fill: var(--folio-series-1);
+	stroke: var(--folio-surface);
+	stroke-width: 1.5;
+}
+
+.folio .folio-donut__ring path[data-slot="2"] {
+	fill: var(--folio-series-2);
+}
+
+.folio .folio-donut__ring path[data-slot="3"] {
+	fill: var(--folio-series-3);
+}
+
+.folio .folio-donut__ring path[data-slot="4"] {
+	fill: var(--folio-series-4);
+}
+
+.folio .folio-donut__ring path[data-slot="5"] {
+	fill: var(--folio-series-5);
+}
+
+.folio .folio-donut__ring path[data-slot="6"] {
+	fill: var(--folio-series-6);
+}
+
+.folio .folio-donut__big {
+	fill: var(--folio-text);
+	font-size: 26px;
+	font-weight: 700;
+}
+
+.folio .folio-donut__small {
+	fill: var(--folio-text-muted);
+	font-size: 11px;
+}
+
+.folio .folio-donut__legend {
+	display: grid;
+	flex: 1 1 12rem;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: 0.92rem;
+}
+
+.folio .folio-donut__legend li {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+	margin: 0;
+	padding: 0;
+}
+
+.folio .folio-donut__name {
+	flex: 1;
+	color: var(--folio-text-2);
+}
+
+.folio .folio-donut__pct {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Data table, note and source */
+.folio .folio-chart__data {
+	margin-top: 1rem;
+	font-size: 0.88rem;
+}
+
+.folio .folio-chart__data summary {
+	color: var(--folio-link);
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.folio .folio-chart__scroll {
+	margin-top: 0.6rem;
+	overflow-x: auto;
+}
+
+.folio .folio-chart__data table {
+	width: 100%;
+	margin: 0;
+	border-collapse: collapse;
+}
+
+.folio .folio-chart__data th,
+.folio .folio-chart__data td {
+	padding: 0.4rem 0.6rem;
+	border-bottom: 1px solid var(--folio-border);
+	text-align: left;
+	font-variant-numeric: tabular-nums;
+}
+
+.folio .folio-chart__data thead th {
+	color: var(--folio-text-muted);
+	font-weight: 600;
+}
+
+.folio .folio-chart__foot {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem 1rem;
+	margin-top: 0.75rem;
+	color: var(--folio-text-muted);
+	font-size: 0.82rem;
+	line-height: 1.45;
+}
+
+.folio .folio-chart__foot a {
+	color: var(--folio-link);
+}
+
+.folio.folio-chart__error {
+	padding: 0.75rem 1rem;
+	border: 1px dashed var(--folio-border-strong);
+	border-radius: var(--folio-radius);
+	color: var(--folio-text-muted);
+	font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+	.folio.folio-chart {
+		padding: 1rem 0.9rem 0.85rem;
+	}
+
+	.folio .folio-bars__row {
+		grid-template-columns: 1fr;
+		gap: 0.25rem;
+	}
+
+	.folio .folio-bars__fill {
+		width: calc(var(--folio-to, 0%) * 0.72);
+	}
+
+	.folio .folio-line {
+		grid-template-rows: 12rem auto;
+	}
+
+	.folio .folio-line__x span.is-minor {
+		display: none;
+	}
+
+	.folio .folio-donut {
+		justify-content: center;
 	}
 }

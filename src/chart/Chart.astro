@@ -1,0 +1,164 @@
+---
+// The chart block on the page. Everything is drawn on the server: bars as HTML rows, a line as
+// an SVG plot stretched to its box with HTML labels over it (text never shrinks on phones), a
+// donut as SVG arcs. Every chart carries its numbers as a data table, its description for
+// screen readers, and its source. A chart that can't be drawn says why instead.
+import "../styles/folio.css";
+import { barModel, chartSpec, donutModel, formatValue, lineModel } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const spec = chartSpec(Astro.props.node);
+const model = !spec.ok ? spec : spec.kind === "bar" ? barModel(spec) : spec.kind === "line" ? lineModel(spec) : donutModel(spec);
+if (!model.ok) console.warn(`[folio] chart ${Astro.props.node._key} not drawn: ${model.reason}`);
+const bar = spec.ok && spec.kind === "bar" && model.ok ? (model as Extract<ReturnType<typeof barModel>, { ok: true }>) : null;
+const line = spec.ok && spec.kind === "line" && model.ok ? (model as Extract<ReturnType<typeof lineModel>, { ok: true }>) : null;
+const donut = spec.ok && spec.kind === "donut" && model.ok ? (model as Extract<ReturnType<typeof donutModel>, { ok: true }>) : null;
+const legend = bar?.legend ?? line?.legend ?? [];
+const unitHead = spec.ok && spec.yUnit ? `${spec.y} (${spec.yUnit})` : spec.ok ? spec.y : "";
+const hasFoot = spec.ok && (spec.caption || spec.source);
+---
+
+{
+	!model.ok ? (
+		<p class="folio folio-chart__error">{`Chart not shown: ${model.reason}`}</p>
+	) : (
+		spec.ok && (
+			<figure class:list={["folio", "folio-chart", `folio-chart--${spec.kind}`]}>
+				{spec.title && <p class="folio-chart__title">{spec.title}</p>}
+
+				{legend.length > 0 && (
+					<ul class="folio-chart__legend" aria-hidden="true">
+						{legend.map((l) => (
+							<li>
+								<span class="folio-swatch" data-slot={l.slot} />
+								{l.name}
+							</li>
+						))}
+					</ul>
+				)}
+
+				{bar && (
+					<div class="folio-bars" role="img" aria-label={spec.alt}>
+						{bar.rows.map((row) => (
+							<div class="folio-bars__row" aria-hidden="true">
+								<span class="folio-bars__label">{row.label}</span>
+								<span class="folio-bars__set">
+									{row.bars.map((b) => (
+										<span class="folio-bars__bar">
+											<span class="folio-bars__fill" data-slot={b.slot} style={`--folio-to:${b.percent}%`} />
+											<span class="folio-bars__val">{b.text}</span>
+										</span>
+									))}
+								</span>
+							</div>
+						))}
+					</div>
+				)}
+
+				{line && line.unitNote && (
+					<p class="folio-line__unit" aria-hidden="true">
+						{line.unitNote}
+					</p>
+				)}
+
+				{line && (
+					<div class="folio-line" role="img" aria-label={spec.alt}>
+						<div class="folio-line__y" aria-hidden="true">
+							{line.yTicks.map((t) => (
+								<span style={`top:${t.percent}%`}>{t.label}</span>
+							))}
+						</div>
+						<div class="folio-line__plot" aria-hidden="true">
+							<svg viewBox="0 0 1000 1000" preserveAspectRatio="none" focusable="false">
+								{line.yTicks.map((t) => (
+									<line class="folio-line__grid" x1="0" x2="1000" y1={t.percent * 10} y2={t.percent * 10} vector-effect="non-scaling-stroke" />
+								))}
+								{line.series.map((s) => s.segments.map((points) => <polyline class="folio-line__path" data-slot={s.slot} points={points} vector-effect="non-scaling-stroke" />))}
+							</svg>
+							{line.series.map((s) => s.points.map((p) => <span class="folio-line__dot" data-slot={s.slot} style={`left:${p.left}%;top:${p.top}%`} title={`${s.name ? `${s.name}, ` : ""}${p.label}: ${p.text}`} />))}
+						</div>
+						<div class="folio-line__x" aria-hidden="true">
+							{line.xLabels.map((l) => (
+								<span class:list={[l.minor && "is-minor"]} style={`left:${l.percent}%`}>{l.label}</span>
+							))}
+						</div>
+					</div>
+				)}
+
+				{donut && (
+					<div class="folio-donut">
+						<svg viewBox="0 0 200 200" role="img" aria-label={spec.alt} class="folio-donut__ring">
+							{donut.slices.map((s) => (
+								<path d={s.path} data-slot={s.slot} fill-rule="evenodd" />
+							))}
+							<text x="100" y="104" text-anchor="middle" class="folio-donut__big" aria-hidden="true">
+								{donut.top.percent}
+							</text>
+							{donut.top.label.length <= 14 && (
+								<text x="100" y="124" text-anchor="middle" class="folio-donut__small" aria-hidden="true">
+									{donut.top.label}
+								</text>
+							)}
+						</svg>
+						<ul class="folio-donut__legend" aria-hidden="true">
+							{donut.slices.map((s) => (
+								<li>
+									<span class="folio-swatch" data-slot={s.slot} />
+									<span class="folio-donut__name">{s.label}</span>
+									<span class="folio-donut__pct">{s.percent}</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
+
+				<details class="folio-chart__data">
+					<summary>Data table</summary>
+					<div class="folio-chart__scroll">
+						<table>
+							<thead>
+								<tr>
+									<th scope="col">{spec.x}</th>
+									{spec.series && <th scope="col">{spec.series}</th>}
+									<th scope="col">{unitHead}</th>
+									{donut && <th scope="col">Share</th>}
+								</tr>
+							</thead>
+							<tbody>
+								{spec.rows.map((r, i) => (
+									<tr>
+										<th scope="row">{String(r[spec.x] ?? "")}</th>
+										{spec.series && <td>{String(r[spec.series] ?? "")}</td>}
+										<td>{typeof r[spec.y] === "number" ? formatValue(r[spec.y] as number, spec.yUnit) : "No data"}</td>
+										{donut && <td>{donut.slices[i]?.percent}</td>}
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</details>
+
+				{hasFoot && (
+					<figcaption class="folio-chart__foot">
+						{spec.caption && <span class="folio-chart__caption">{spec.caption}</span>}
+						{spec.source && (
+							<span class="folio-chart__source">
+								Source:{" "}
+								{spec.source.href ? (
+									<a href={spec.source.href} rel={/^https?:/i.test(spec.source.href) ? "noopener" : undefined}>
+										{spec.source.name}
+									</a>
+								) : (
+									spec.source.name
+								)}
+							</span>
+						)}
+					</figcaption>
+				)}
+			</figure>
+		)
+	)
+}

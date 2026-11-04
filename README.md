@@ -20,7 +20,7 @@ Registered in `emdash/astro.config.mjs` as a native plugin:
 ```js
 {
   id: "folio",
-  version: "0.2.0",
+  version: "0.3.0",
   entrypoint: ".../packages/folio/src/index.ts",
   componentsEntry: ".../packages/folio/src/blocks.ts",
 }
@@ -60,3 +60,21 @@ The verdict card right after a review's intro. Its fields also make the page's R
 | Main button, second link | Optional label and link pairs (`#anchor`, `/path` or `https://…`). Links to `/go/` redirects or other sites get `rel="sponsored nofollow noopener noreferrer"`. |
 
 Review markup: `itemReviewed` (type and name), `reviewRating` (the overall score, best 10, worst 0) and `reviewBody`; the site adds the review's id, url, author, publisher and dates. Whether Google shows review stars is Google's call; don't promise them.
+
+### Chart (`folioChart`)
+
+Bar, line and donut charts from pasted data, drawn on the server by Folio itself (no chart library). Every chart carries its description for screen readers, a data table behind a "Data table" toggle, an optional note and a linked source.
+
+| Field | Notes |
+|---|---|
+| Chart | **Bars** to compare or rank amounts (horizontal, so labels stay readable on phones; values from zero up), **Line** for change over time, **Donut** for parts of one whole (up to 6 slices, no negatives). |
+| Title | Shown above the chart. |
+| What it shows | Required. One sentence with the finding; screen readers read it as the chart. |
+| Data | CSV, tab separated (pasted from a spreadsheet) or semicolon separated. The first row names the columns. Values may carry thousands separators, a leading currency sign or a trailing %. Up to 500 rows. |
+| Column for the labels / along the bottom | The x column, matched without regard to case. On a line, numbers (years) are spaced by value, text evenly in row order. |
+| Column of values | Must be numbers. Lines allow empty cells (a gap); bars and donuts don't. |
+| Series column | Optional: up to 4 series for bars (grouped), 6 for lines. |
+| Unit | `%`, a currency sign (`$`, `₹`, `€`, `£`, `¥`) or a word (`million`). |
+| Note, source, source link | Under the chart. Every chart of real data should name its source and date. |
+
+A chart that can't be drawn shows a short note saying why, and logs it. Layout comes from fixed formulas in `src/chart/rules.ts` (nice axis ticks, bar widths, line positions on a 1000 by 1000 plot, donut arcs), all tested.

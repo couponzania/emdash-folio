@@ -7,18 +7,19 @@
 // to the site's --cz-* tokens.
 import { definePlugin } from "emdash";
 
+import { chartBlock } from "./chart/block.ts";
 import { snapshotBlock } from "./review-snapshot/block.ts";
 import { saleCalendarBlock } from "./sale-calendar/block.ts";
 
 export const FOLIO_PLUGIN_ID = "folio";
-export const FOLIO_VERSION = "0.2.0";
+export const FOLIO_VERSION = "0.3.0";
 
 export function createPlugin() {
 	return definePlugin({
 		id: FOLIO_PLUGIN_ID,
 		version: FOLIO_VERSION,
 		admin: {
-			portableTextBlocks: [saleCalendarBlock, snapshotBlock],
+			portableTextBlocks: [saleCalendarBlock, snapshotBlock, chartBlock],
 		},
 	});
 }
