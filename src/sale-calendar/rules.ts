@@ -8,6 +8,7 @@
 //   around 25 Dec            around a day: always Expected, never Live
 //   not regular: {text}      no recurring window yet; the text is shown as is
 // Old formats still read: 07-16..07-31, ~12-25, none: {text}. Anything else is kept as text.
+import { rowsOf, safeHref, text } from "../shared/fields.ts";
 
 export interface Day {
 	y: number;
@@ -126,19 +127,9 @@ export function nextLabel(run: Run): string {
 	return start.y === end.y ? `${md(start.m, start.d)} to ${mdy(end)}` : `${mdy(start)} to ${mdy(end)}`;
 }
 
-const text = (v: unknown) => (typeof v === "string" ? v.trim() : "");
-
-/** Only links to a place on the page, a path on the site, or an http(s) address. */
-function safeHref(v: unknown): string {
-	const href = text(v);
-	return /^(#[\w-]+|\/(?!\/)\S*|https?:\/\/\S+)$/i.test(href) ? href : "";
-}
-
 /** The block's rows, worked out for today, in the order the author wrote them. */
 export function saleCalendarRows(node: Record<string, unknown>, today: Day): SaleCalendarRow[] {
-	if (!Array.isArray(node.rows)) return [];
-	return node.rows.flatMap((raw) => {
-		const row = (raw ?? {}) as Record<string, unknown>;
+	return rowsOf(node.rows).flatMap((row) => {
 		const name = text(row.name);
 		if (name === "") return [];
 		const window = parseWhen(text(row.when));

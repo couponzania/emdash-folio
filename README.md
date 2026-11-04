@@ -20,7 +20,7 @@ Registered in `emdash/astro.config.mjs` as a native plugin:
 ```js
 {
   id: "folio",
-  version: "0.1.0",
+  version: "0.2.0",
   entrypoint: ".../packages/folio/src/index.ts",
   componentsEntry: ".../packages/folio/src/blocks.ts",
 }
@@ -42,3 +42,21 @@ A brand's sales in calendar order. Each row stores a recurring window; the next 
 Status: **Live now** inside a fixed window, **Expected** before it (or for an "around" day), **Not announced** with no regular window. 29 Feb becomes 28 Feb outside leap years. Pages are cached for up to a day, so a status can lag by that much.
 
 Wide screens get a table; phones get one card per sale, with no sideways scroll.
+
+### Review snapshot (`folioSnapshot`)
+
+The verdict card right after a review's intro. Its fields also make the page's Review markup (`snapshotReview()`, used by the site's `blog-schema.ts`), so the card and the schema always agree.
+
+| Field | Notes |
+|---|---|
+| What is reviewed | The name in the Review markup (`itemReviewed.name`). No name, no Review markup. |
+| It is a | Store, brand or company (`Organization`), Product, or Software or app (`SoftwareApplication`). |
+| Verdict | One sentence that names the item; it stands alone if a search result lifts it. Also the Review's `reviewBody`. |
+| Overall score | Out of 10, one decimal. Blank: the average of the score rows. Outside 0 to 10: ignored. |
+| Key stats | 3 or 4 value and label pairs. A row missing either half is skipped. |
+| Score rows | 2 to 4 criteria with a score out of 10 ("9.7" or "9.7/10"). The bars are drawn from the score. |
+| Skip it if | A real, specific disqualifier from the review. |
+| Checked, note | "November 2026", and an optional note such as "30 day money back". |
+| Main button, second link | Optional label and link pairs (`#anchor`, `/path` or `https://…`). Links to `/go/` redirects or other sites get `rel="sponsored nofollow noopener noreferrer"`. |
+
+Review markup: `itemReviewed` (type and name), `reviewRating` (the overall score, best 10, worst 0) and `reviewBody`; the site adds the review's id, url, author, publisher and dates. Whether Google shows review stars is Google's call; don't promise them.

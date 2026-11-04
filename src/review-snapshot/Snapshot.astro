@@ -1,0 +1,91 @@
+---
+// The review snapshot block on the page: verdict and score, key stats, score rows, who should
+// skip it, when it was checked, and up to two links. Server rendered, no script.
+import "../styles/folio.css";
+import { buttonRel } from "../shared/fields.ts";
+import { snapshotData } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const d = snapshotData(Astro.props.node);
+const show = d.verdict !== "" || d.score !== null;
+---
+
+{
+	show && (
+		<section class="folio folio-snap" aria-label={d.itemName ? `${d.itemName} at a glance` : "At a glance"}>
+			<div class="folio-snap__top">
+				{d.verdict && <p class="folio-snap__verdict">{d.verdict}</p>}
+				{d.score !== null && (
+					<p class="folio-snap__score">
+						<strong>{d.scoreText}</strong>
+						<span>out of 10</span>
+					</p>
+				)}
+			</div>
+
+			{d.stats.length > 0 && (
+				<dl class="folio-snap__stats">
+					{d.stats.map((s) => (
+						<div class="folio-snap__stat">
+							<dt>{s.label}</dt>
+							<dd>{s.value}</dd>
+						</div>
+					))}
+				</dl>
+			)}
+
+			{d.scores.length > 0 && (
+				<ul class="folio-snap__scores">
+					{d.scores.map((s) => (
+						<li class="folio-snap__row">
+							<span class="folio-snap__label">{s.label}</span>
+							<span class="folio-snap__track" aria-hidden="true">
+								<span class="folio-snap__fill" style={`--folio-fill-to:${s.percent}%`} />
+							</span>
+							<span class="folio-snap__val">{`${s.text}/10`}</span>
+						</li>
+					))}
+				</ul>
+			)}
+
+			{d.skip && (
+				<p class="folio-snap__skip">
+					<strong>Skip it if:</strong> {d.skip}
+				</p>
+			)}
+
+			{(d.checked || d.note || d.cta || d.more) && (
+				<div class="folio-snap__foot">
+					{(d.checked || d.note) && (
+						<p class="folio-snap__trust">
+							{d.checked && (
+								<>
+									Checked <strong>{d.checked}</strong>
+								</>
+							)}
+							{d.checked && d.note && <span aria-hidden="true"> · </span>}
+							{d.note}
+						</p>
+					)}
+					{(d.cta || d.more) && (
+						<p class="folio-snap__actions">
+							{d.cta && (
+								<a class="folio-snap__cta" href={d.cta.href} rel={buttonRel(d.cta.href)}>
+									{d.cta.label}
+								</a>
+							)}
+							{d.more && (
+								<a class="folio-snap__more" href={d.more.href} rel={buttonRel(d.more.href)}>
+									{d.more.label}
+								</a>
+							)}
+						</p>
+					)}
+				</div>
+			)}
+		</section>
+	)
+}

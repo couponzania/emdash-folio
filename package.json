@@ -1,6 +1,6 @@
 {
   "name": "emdash-folio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Article blocks for EmDash: editor blocks with fields, rendered on the server.",
   "private": true,
   "type": "module",
