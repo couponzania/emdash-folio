@@ -2,6 +2,11 @@
 
 Every change to Folio gets an entry and a version bump (semver), released as a `v{version}` tag. The version lives in `package.json` and `FOLIO_VERSION` in `src/plugin.js`; a test fails if they or this file disagree.
 
+## 0.8.0 (2026-11-05)
+
+- **Breaking for sites that relied on it:** Folio no longer reads any `--cz-*` variables. Its defaults are now plain, neutral values. A site that wants its own colours sets `--folio-*` variables in a plain `.folio { … }` rule (see Styling in the README).
+- A test fails if any Folio stylesheet reads a variable that isn't `--folio-*`.
+
 ## 0.7.1 (2026-11-05)
 
 - Scatter: a word unit for the bottom axis (for example "MB") is now named under the axis; before, it was lost.

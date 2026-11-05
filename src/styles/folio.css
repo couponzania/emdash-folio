@@ -1,32 +1,31 @@
-/* Folio blocks. Every colour and size comes from a --folio-* variable. The defaults below sit
-   under :where(), so a site overrides any of them with a plain `.folio { --folio-accent: … }`.
-   Each default first tries a --cz-* token (the original host's names), then a plain value.
-   Light only. */
+/* Folio blocks. Every colour and size comes from a --folio-* variable. The neutral defaults
+   below sit under :where(), so a site sets its own with a plain `.folio { --folio-accent: … }`
+   rule. Light only. */
 :where(.folio) {
-	--folio-text: var(--cz-text, #1d1d1f);
-	--folio-text-muted: var(--cz-text-muted, #636b78);
-	--folio-surface: var(--cz-surface, #fff);
-	--folio-fill: var(--cz-bg-2, #f5f5f7);
-	--folio-border: var(--cz-border, #e0e0e0);
-	--folio-border-strong: var(--cz-border-strong, #c8c8c8);
-	--folio-link: var(--cz-link, #006ad5);
-	--folio-live: var(--cz-green-solid, #137a3f);
-	--folio-on-live: var(--cz-on-dark, #fff);
-	--folio-expected-fill: var(--cz-blue-lt, #e8f1fc);
-	--folio-expected-text: var(--cz-link, #006ad5);
-	--folio-text-2: var(--cz-text-2, #555);
-	--folio-accent: var(--cz-blue, #0071e3);
-	--folio-accent-dk: var(--cz-blue-dk, #0058b3);
-	--folio-on-accent: var(--cz-on-dark, #fff);
-	--folio-dark: var(--cz-navy, #0b1f3a);
-	--folio-warn-fill: var(--cz-orange-lt, #fef3e2);
-	--folio-warn: var(--cz-orange, #a85913);
-	--folio-shadow: var(--cz-shadow, 0 2px 12px rgba(0, 0, 0, 0.08));
-	--folio-radius: var(--cz-radius, 10px);
-	--folio-radius-lg: var(--cz-radius-lg, 16px);
-	--folio-radius-pill: var(--cz-radius-pill, 999px);
-	/* Chart series: the brand blue, then Okabe and Ito's colour-blind-safe palette. */
-	--folio-series-1: var(--cz-blue, #0071e3);
+	--folio-text: #1d1d1f;
+	--folio-text-muted: #636b78;
+	--folio-surface: #fff;
+	--folio-fill: #f5f5f7;
+	--folio-border: #e0e0e0;
+	--folio-border-strong: #c8c8c8;
+	--folio-link: #006ad5;
+	--folio-live: #137a3f;
+	--folio-on-live: #fff;
+	--folio-expected-fill: #e8f1fc;
+	--folio-expected-text: #006ad5;
+	--folio-text-2: #555;
+	--folio-accent: #0071e3;
+	--folio-accent-dk: #0058b3;
+	--folio-on-accent: #fff;
+	--folio-dark: #0b1f3a;
+	--folio-warn-fill: #fef3e2;
+	--folio-warn: #a85913;
+	--folio-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	--folio-radius: 10px;
+	--folio-radius-lg: 16px;
+	--folio-radius-pill: 999px;
+	/* Chart series: the accent colour, then Okabe and Ito's colour-blind-safe palette. */
+	--folio-series-1: #0071e3;
 	--folio-series-2: #e69f00;
 	--folio-series-3: #009e73;
 	--folio-series-4: #d55e00;

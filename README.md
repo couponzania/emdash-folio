@@ -75,7 +75,7 @@ Requires `astro` 7.3 or later and `emdash` 1.4 or later (peer dependencies). Fol
 Install a release tag from GitHub:
 
 ```sh
-npm install github:couponzania/emdash-folio#v0.7.1
+npm install github:couponzania/emdash-folio#v0.8.0
 ```
 
 Register it in `astro.config.mjs`:
