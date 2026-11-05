@@ -26,6 +26,8 @@ export interface ScatterModel {
 	ok: true;
 	legend: LegendItem[];
 	unitNote: string;
+	/** A word unit for the bottom axis ("MB"), named once under it; "" when ticks carry it. */
+	xUnitNote: string;
 	yTicks: Tick[];
 	xTicks: Array<Tick & { minor: boolean }>;
 	points: Array<{ left: number; top: number; slot: number; text: string }>;
@@ -45,6 +47,7 @@ export function scatterModel(spec: ChartSpec): ScatterModel | ChartError {
 		ok: true,
 		legend: names.map((name, i) => ({ name, slot: i + 1 })),
 		unitNote: isWordUnit(spec.yUnit) ? spec.yUnit : "",
+		xUnitNote: isWordUnit(spec.xUnit) ? spec.xUnit : "",
 		yTicks: ya.ticks,
 		xTicks: xa.ticks.map((t, i) => ({ ...t, minor: xLabels[i].minor })),
 		points: spec.rows.map((r, i) => {
@@ -64,6 +67,17 @@ export function niceStep(rough: number): number {
 	const mag = 10 ** Math.floor(Math.log10(rough));
 	const options = [0.5, 1, 2, 2.5, 5, 10].map((f) => f * mag);
 	return options.reduce((best, s) => (Math.abs(Math.log(s / rough)) < Math.abs(Math.log(best / rough)) ? s : best));
+}
+
+/** Ticks for counts: from zero in whole steps of 1, 2 or 5 times a power of ten, about 5 of them. */
+export function countTicks(max: number): { ticks: Tick[]; hi: number } {
+	const rough = Math.max(1, max / 5);
+	const mag = 10 ** Math.floor(Math.log10(rough));
+	const step = [1, 2, 5, 10].map((f) => f * mag).find((s) => s >= rough) ?? 10 * mag;
+	const hi = Math.max(step, Math.ceil(max / step) * step);
+	const ticks: Tick[] = [];
+	for (let v = 0; v <= hi; v += step) ticks.push({ value: v, label: String(v), percent: round(((hi - v) / hi) * 100) });
+	return { ticks, hi };
 }
 
 export interface HistogramModel {
@@ -96,7 +110,7 @@ export function histogramModel(spec: ChartSpec): HistogramModel | ChartError {
 		bins[i].count++;
 	}
 	const most = Math.max(...bins.map((b) => b.count));
-	const { ticks, hi } = zeroTicks(most, "");
+	const { ticks, hi } = countTicks(most);
 	const edges = phoneLabels(
 		Array.from({ length: count + 1 }, (_, i) => ({ label: formatValue(round(lo + i * step, 10), spec.yUnit), percent: round((i / count) * 100) })),
 	);

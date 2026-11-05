@@ -1,72 +1,172 @@
 # Folio
 
-Article blocks for EmDash. Each block is an editor block with fields (typed in the admin, never pasted HTML), rendered on the server as plain HTML, so readers, Google and AI crawlers all get the content without scripts.
+**Article blocks and charts for any EmDash site.** Folio adds 13 ready-made blocks to the EmDash editor: charts, tables, steps, metric cards, timelines, pros and cons, verdicts, callouts and more. Authors fill in fields in the admin; Folio turns them into fast, accessible, search-friendly HTML on the server. No chart library, no client JavaScript, no pasted HTML.
 
-Built for and used on [couponzania.com](https://couponzania.com). MIT licensed.
+Folio is a general EmDash plugin, made for every EmDash site, whatever it publishes: a blog, a docs site, a news site, a review site or a shop's journal. Nothing in it is tied to one site; anything a site may want differently is an option or a CSS variable.
+
+![Folio charts: scatter, histogram, heatmap and funnel](docs/images/charts-1.png)
+
+![Folio charts: waterfall, bars plus a line, bars below zero and grouped columns](docs/images/charts-2.png)
+
+## Why Folio
+
+Long articles need more than paragraphs, and the usual ways of adding the extras all cost something:
+
+- **Pasted HTML** breaks when the theme changes, can't be checked, and is easy to get wrong.
+- **Chart libraries** ship tens of kilobytes of JavaScript, draw nothing until the script runs, and often hide the numbers from search engines and screen readers.
+- **Screenshots of charts** go stale, can't be read by crawlers or assistive technology, and blur on large screens.
+
+Folio replaces all three with **editor blocks with fields**. The author picks a block from the slash menu and types or pastes the content; the site renders it.
+
+## What you get
+
+- **13 blocks** in the editor's slash menu, under "Folio".
+- **13 chart types** in one chart block, drawn by Folio's own code from pasted data (CSV, tabs straight from a spreadsheet, or semicolons).
+- **Server rendered HTML and SVG.** Every number is in the page source, so readers, search engines and AI crawlers see the content without running scripts. Nothing to hydrate, nothing to load late.
+- **Accessible by default.** Each chart has a written description that screen readers announce, and a "Data table" with every value. Tables keep real table markup.
+- **Phone friendly.** Wide layouts turn into stacked cards on small screens; tables become one card per row. Pages never scroll sideways.
+- **Structured data from the same fields.** The steps block can produce HowTo markup and the review snapshot produces Review markup, so the schema always matches what is on the page.
+- **Checks instead of surprises.** When pasted data doesn't fit a chart (a missing column, text where a number should be, too many slices), the block shows a short note saying why instead of drawing something misleading.
+- **Themeable.** Every colour, radius and shadow is a `--folio-*` CSS variable; one rule restyles all blocks.
+- **Tested.** Every layout rule is a pure function with unit tests; CI runs the tests and a type check on every change.
+
+## The blocks
+
+| Block | Type name | Use it for |
+|---|---|---|
+| TL;DR | `folioTldr` | The short version of an article, 3 to 5 points near the top |
+| Steps | `folioSteps` | A numbered process; can also produce the page's HowTo markup |
+| Callout | `folioCallout` | A tip, a warning or a standout finding, set apart from the text |
+| Metric cards | `folioMetrics` | 2 to 4 headline numbers with their source |
+| Chart | `folioChart` | Any of the 13 chart types below |
+| Table | `folioTable` | A comparison table from pasted rows, with an optional highlighted column |
+| Timeline | `folioTimeline` | Dated events in order |
+| Pros and cons | `folioProsCons` | What's good and what's not, side by side |
+| Verdict | `folioVerdict` | A stated pick, why, and the catch |
+| Choose A or B | `folioChoose` | Who should pick each of two options |
+| Who it's for | `folioAudience` | Who something suits and, always, who it doesn't |
+| Review snapshot | `folioSnapshot` | A review's verdict card: score, key stats, score rows; produces Review markup |
+| Sale calendar | `folioSaleCalendar` | Recurring sales or events whose next dates and status update by themselves every year |
+
+## The chart types
+
+| Chart | Shows |
+|---|---|
+| Bars | Amounts compared or ranked; grouped by series; values below zero diverge from a zero line |
+| Columns | A few periods side by side, single or grouped |
+| Line | Change over time, up to 6 lines, with gaps for missing values |
+| Area | A total over time, or up to 4 areas stacked |
+| Stacked bars | Parts of a whole across groups, as totals or as 100% shares |
+| Donut | Parts of one whole, up to 6 slices |
+| Comparison | Two values per row (before and after), sorted by the change |
+| Scatter | Two measures against each other, coloured by group |
+| Histogram | How one set of values is spread, in equal round ranges |
+| Heatmap | A grid shaded by value |
+| Funnel | How many make it through each stage |
+| Waterfall | Changes adding up to a total |
+| Bars plus a line | Two measures with different units, each on its own axis |
+
+Axes use round steps, labels never shrink on phones, and colours follow a colour-blind-safe palette after your accent colour.
 
 ## Install
 
-Folio ships its TypeScript and Astro source (no build step); the site's Astro build compiles it. Install a release tag from GitHub:
+Requires `astro` 7.3 or later and `emdash` 1.4 or later (peer dependencies). Folio ships its TypeScript and Astro source; your site's Astro build compiles it, so there is no build step.
+
+Install a release tag from GitHub:
 
 ```sh
-npm install github:couponzania/emdash-folio#v0.4.0
+npm install github:couponzania/emdash-folio#v0.7.1
 ```
 
-Then register it in `astro.config.mjs`:
+Register it in `astro.config.mjs`:
 
 ```js
+import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 import { folioPlugin } from "emdash-folio/plugin";
 
-emdash({
-  plugins: [
-    folioPlugin({
-      // Optional: link prefixes that are paid or affiliate links. Snapshot buttons under
-      // one get rel="sponsored nofollow noopener noreferrer". Default: none.
-      paidLinks: ["/go/"],
+export default defineConfig({
+  integrations: [
+    emdash({
+      plugins: [folioPlugin()],
     }),
   ],
 });
 ```
 
-The blocks then appear in the editor's slash menu, and every `<PortableText>` renders them.
+That's all: the blocks appear in the editor's slash menu, and every `<PortableText>` renders them.
 
-Requires `astro` 7.3 or later and `emdash` 1.4 or later (peer dependencies).
+### Options
+
+```js
+folioPlugin({
+  // Link prefixes that count as paid or affiliate links. A review snapshot button whose link
+  // starts with one gets rel="sponsored nofollow noopener noreferrer". Default: none.
+  paidLinks: ["/go/", "https://"],
+});
+```
 
 ### Styling
 
-Every colour, radius and shadow is a `--folio-*` variable (classes are `folio-*`). Defaults sit under `:where(.folio)`, so a site sets its own with a plain rule:
+Every colour, radius and shadow is a `--folio-*` variable, and every class starts with `folio-`. The defaults sit under `:where(.folio)`, so one plain rule in your own CSS overrides them:
 
 ```css
 .folio {
-  --folio-accent: #0071e3;
+  --folio-accent: #0b6bcb;     /* buttons, first chart series, highlights */
+  --folio-text: #1d1d1f;
+  --folio-surface: #ffffff;    /* card backgrounds */
+  --folio-border: #e0e0e0;
   --folio-radius: 8px;
+  --folio-radius-lg: 14px;
 }
 ```
 
-Each default first tries a `--cz-*` token (the names of the site Folio was built for), then a plain value. Light only.
+The full list is at the top of `src/styles/folio.css`. Folio is designed for light themes.
 
-### Review markup
+### Structured data
 
-A review page can build its Review JSON-LD from the snapshot block's fields, so the card and the schema always agree:
+Folio gives you the schema pieces; your site adds them to its own JSON-LD with the page's url, author and dates.
 
 ```ts
 import { SNAPSHOT_TYPE, snapshotReview } from "emdash-folio/review-snapshot";
+import { STEPS_TYPE, stepsHowTo } from "emdash-folio/steps";
 
-const node = body.find((b) => b._type === SNAPSHOT_TYPE);
-const review = node ? snapshotReview(node) : null; // add @id, url, author, publisher, dates
+const review = body.find((b) => b._type === SNAPSHOT_TYPE);
+const reviewLd = review ? snapshotReview(review) : null; // itemReviewed, reviewRating, reviewBody
+
+const steps = body.find((b) => b._type === STEPS_TYPE);
+const howToLd = steps ? stepsHowTo(steps) : null; // name, totalTime, step[]
 ```
 
-## Rules for working on Folio
+Whether a search engine shows anything special for this markup is its own decision; Folio makes sure the markup is correct and matches the page.
 
-- **One direction only.** Nothing in Folio imports from a host site. Folio may use EmDash's public API (`emdash`).
-- **Styling through variables**, as above.
+## Versions
+
+Folio follows semver; every release is a `v{version}` tag with notes in [CHANGELOG.md](CHANGELOG.md). Pin a tag in your `package.json` and move to a new one when you are ready.
+
+## Working on Folio
+
+```sh
+npm install
+npm test            # unit tests (Node's test runner)
+npm run typecheck   # astro check
+```
+
+- **No ties to any site.** Nothing in Folio imports from a host site; site differences are options or CSS variables. Folio uses only EmDash's public API.
 - **Server rendered, no client script** unless a block truly needs one.
-- **Schema from fields.** When a block carries structured data, it is built from the block's fields, never by reading HTML.
-- **Tested.** Pure rules live in `rules.ts` files with tests in `tests/` (`npm test`, Node's own test runner). `npm run typecheck` runs `astro check`. CI runs both on every push and pull request.
-- **Versioned.** Every change bumps the version (semver) in `package.json` and `FOLIO_VERSION` in `src/plugin.js`, adds a `CHANGELOG.md` entry, and is released as a `v{version}` tag. Sites pin a tag.
+- **Schema from fields.** Structured data is built from a block's fields, never by reading HTML.
+- **Tested.** Layout and validation rules live in `rules.ts` files with tests in `tests/`.
+- **Versioned.** Every code change bumps the version in `package.json` and `FOLIO_VERSION` in `src/plugin.js` and adds a `CHANGELOG.md` entry; a test fails if they disagree.
 
-## Blocks
+Issues and pull requests are welcome.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
+
+## Block reference
+
+Every field of every block, what it accepts, and what happens when the input does not fit.
 
 ### Sale calendar (`folioSaleCalendar`)
 
@@ -75,7 +175,7 @@ A brand's sales in calendar order. Each row stores a recurring window; the next 
 | Field | Notes |
 |---|---|
 | Sale name | Required; a row without one is skipped. |
-| Usually runs | `16 Jul to 31 Jul` (a fixed window; may cross new year, `20 Dec to 5 Jan`), `around 25 Dec` (always Expected, never Live), or `not regular: {text}` (shown as is; next dates read Not announced). The old shortcode formats `07-16..07-31`, `~12-25` and `none: {text}` also work. Anything else is shown as text, never guessed. |
+| Usually runs | `16 Jul to 31 Jul` (a fixed window; may cross new year, `20 Dec to 5 Jan`), `around 25 Dec` (always Expected, never Live), or `not regular: {text}` (shown as is; next dates read Not announced). Short forms `07-16..07-31`, `~12-25` and `none: {text}` also work. Anything else is shown as text, never guessed. |
 | Best for | One short phrase under the name. |
 | Link | Optional: `#anchor`, `/path` or `https://…`. Anything else is dropped. |
 

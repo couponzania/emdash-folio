@@ -2,6 +2,13 @@
 
 Every change to Folio gets an entry and a version bump (semver), released as a `v{version}` tag. The version lives in `package.json` and `FOLIO_VERSION` in `src/plugin.js`; a test fails if they or this file disagree.
 
+## 0.7.1 (2026-11-05)
+
+- Scatter: a word unit for the bottom axis (for example "MB") is now named under the axis; before, it was lost.
+- Histogram: the count axis uses whole steps (0, 5, 10, 15), never fractions like 2.5.
+- Neutral placeholders in the steps and metric cards editor fields.
+- README rewritten as a full product page, with chart screenshots.
+
 ## 0.7.0 (2026-11-05)
 
 - Six more chart types in the chart block, drawn by Folio's own code: **Scatter** (`scatter`), **Histogram** (`histogram`), **Heatmap** (`heatmap`), **Funnel** (`funnel`), **Waterfall** (`waterfall`) and **Bars plus a line** (`combo`, the line on its own right axis). Each says why when the data doesn't fit.

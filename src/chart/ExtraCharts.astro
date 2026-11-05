@@ -48,6 +48,11 @@ const { alt, scatter, histogram, heatmap, funnel, waterfall, combo, yName } = As
 					<span class:list={[t.minor && "is-minor"]} style={`left:${t.percent}%`}>{t.label}</span>
 				))}
 			</div>
+			{scatter.xUnitNote && (
+				<p class="folio-scatter__xunit" aria-hidden="true">
+					{scatter.xUnitNote}
+				</p>
+			)}
 		</div>
 	)
 }

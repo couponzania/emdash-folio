@@ -9,7 +9,7 @@ export const stepsBlock: PortableTextBlockConfig = {
 	description: "A numbered process; also gives the page its HowTo markup",
 	category: "Folio",
 	fields: [
-		{ type: "text_input", action_id: "title", label: "What the steps do", placeholder: "How to apply a coupon code" },
+		{ type: "text_input", action_id: "title", label: "What the steps do", placeholder: "How to set up two step sign in" },
 		{ type: "text_input", action_id: "minutes", label: "Total time in minutes (optional)", placeholder: "2" },
 		{
 			type: "repeater",

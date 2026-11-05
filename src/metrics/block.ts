@@ -17,7 +17,7 @@ export const metricsBlock: PortableTextBlockConfig = {
 			min_items: 2,
 			fields: [
 				{ type: "text_input", action_id: "value", label: "Number", placeholder: "88%" },
-				{ type: "text_input", action_id: "label", label: "What it is", placeholder: "Shoppers who used a coupon" },
+				{ type: "text_input", action_id: "label", label: "What it is", placeholder: "Readers who finished the article" },
 				{ type: "text_input", action_id: "context", label: "Context (optional)", placeholder: "in the last year" },
 			],
 		},

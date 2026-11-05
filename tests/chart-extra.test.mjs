@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { comboModel, funnelModel, heatmapModel, histogramModel, niceStep, scatterModel, waterfallModel } from "../src/chart/extra-rules.ts";
+import { comboModel, countTicks, funnelModel, heatmapModel, histogramModel, niceStep, scatterModel, waterfallModel } from "../src/chart/extra-rules.ts";
 import { chartSpec } from "../src/chart/rules.ts";
 
 const spec = (over) => {
@@ -35,6 +35,11 @@ test("scatterModel: both axes on round steps, dots by value, series colour them"
 		],
 	);
 	assert.deepEqual(m.points[0], { left: 0, top: 100, slot: 1, text: "A: $10, 5%" });
+	assert.equal(m.xUnitNote, "", "a currency sign sits on the ticks");
+	const words = scatterModel(spec({ kind: "scatter", data: "w,t\n1,2\n2,3\n3,5", x: "w", y: "t", xUnit: "MB", yUnit: "seconds" }));
+	assert.equal(words.xUnitNote, "MB", "a word unit is named once under the axis");
+	assert.equal(words.unitNote, "seconds");
+	assert.equal(words.xTicks[0].label, "1");
 	assert.deepEqual(m.points[2], { left: 100, top: 0, slot: 1, text: "A: $40, 20%" });
 	assert.equal(m.points[1].slot, 2);
 	assert.match(scatterModel(spec({ kind: "scatter", data: "a,b\n1,2\n2,3", x: "a", y: "b" })).reason, /three points/);
@@ -42,6 +47,16 @@ test("scatterModel: both axes on round steps, dots by value, series colour them"
 
 test("niceStep: round steps", () => {
 	assert.deepEqual([0.7, 1.5, 2.2, 4, 7, 12.4, 23].map(niceStep), [0.5, 2, 2, 5, 5, 10, 25]);
+});
+
+test("countTicks: whole steps from zero, never fractions", () => {
+	const v = (max) => countTicks(max).ticks.map((t) => t.value);
+	assert.deepEqual(v(11), [0, 5, 10, 15]);
+	assert.deepEqual(v(3), [0, 1, 2, 3]);
+	assert.deepEqual(v(1), [0, 1]);
+	assert.deepEqual(v(7), [0, 2, 4, 6, 8]);
+	assert.deepEqual(v(240), [0, 50, 100, 150, 200, 250]);
+	for (const max of [1, 2, 3, 7, 11, 13, 99, 240]) assert.ok(v(max).every(Number.isInteger), `${max}`);
 });
 
 test("histogramModel: equal round bins, the maximum in the last bin, counts as heights", () => {

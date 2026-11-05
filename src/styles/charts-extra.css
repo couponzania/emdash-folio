@@ -357,3 +357,22 @@
 .folio .folio-combo {
 	margin-top: 1.25rem;
 }
+
+/* Scatter: a word unit for the bottom axis, named once under it. */
+.folio .folio-scatter {
+	grid-template-rows: 15rem auto auto;
+}
+
+.folio .folio-scatter__xunit {
+	grid-column: 2;
+	margin: 0.15rem 0 0;
+	color: var(--folio-text-muted);
+	font-size: 0.78rem;
+	text-align: right;
+}
+
+@media (max-width: 640px) {
+	.folio .folio-scatter {
+		grid-template-rows: 12rem auto auto;
+	}
+}
