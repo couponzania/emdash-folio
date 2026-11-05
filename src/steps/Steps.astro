@@ -1,0 +1,34 @@
+---
+// The steps block on the page: numbered steps joined by a line, with the total time beside the
+// title. Fewer than 2 steps, nothing.
+import "../styles/folio.css";
+import "../styles/blocks.css";
+import { stepsData } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const d = stepsData(Astro.props.node);
+---
+
+{
+	d.steps.length >= 2 && (
+		<section class="folio folio-box folio-stepsbox" aria-label={d.title || "Steps"}>
+			{(d.title || d.timeText) && (
+				<p class="folio-h">
+					{d.title}
+					{d.timeText && <span class="folio-steps__meta">{d.title ? ` · ${d.timeText}` : d.timeText}</span>}
+				</p>
+			)}
+			<ol class="folio-steps">
+				{d.steps.map((s) => (
+					<li>
+						<p class="folio-steps__name">{s.name || s.text}</p>
+						{s.name && s.text && <p class="folio-steps__text">{s.text}</p>}
+					</li>
+				))}
+			</ol>
+		</section>
+	)
+}

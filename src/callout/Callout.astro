@@ -1,0 +1,26 @@
+---
+// The callout block on the page: an icon, a title and the text on a tinted panel. No text, nothing.
+import "../styles/folio.css";
+import "../styles/blocks.css";
+import { calloutData } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const d = calloutData(Astro.props.node);
+---
+
+{
+	d.text && (
+		<aside class:list={["folio", "folio-callout", `folio-callout--${d.kind}`]} aria-label={d.title}>
+			<span class="folio-callout__icon" aria-hidden="true">
+				{d.icon}
+			</span>
+			<p>
+				<strong class="folio-callout__title">{d.title}</strong>
+				{d.text}
+			</p>
+		</aside>
+	)
+}

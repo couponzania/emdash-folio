@@ -1,0 +1,25 @@
+---
+// The TL;DR block on the page: a tinted box with the article's main points. No points, nothing.
+import "../styles/folio.css";
+import "../styles/blocks.css";
+import { tldrData } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const d = tldrData(Astro.props.node);
+---
+
+{
+	d.points.length > 0 && (
+		<aside class="folio folio-tldr" aria-label={d.title}>
+			<p class="folio-kicker">{d.title}</p>
+			<ul class="folio-tldr__list">
+				{d.points.map((p) => (
+					<li>{p}</li>
+				))}
+			</ul>
+		</aside>
+	)
+}

@@ -118,3 +118,50 @@ Bar, line and donut charts from pasted data, drawn on the server by Folio itself
 | Note, source, source link | Under the chart. Every chart of real data should name its source and date. |
 
 A chart that can't be drawn shows a short note saying why, and logs it. Layout comes from fixed formulas in `src/chart/rules.ts` (nice axis ticks, bar widths, line positions on a 1000 by 1000 plot, donut arcs), all tested.
+
+### TL;DR (`folioTldr`)
+
+The short version near the top of an article. **Title** (default "The short version") and **Points**, one per line (3 to 5; at most 6 are shown). A leading `-`, `*`, `•` or `1.` typed out of habit is removed.
+
+### Steps (`folioSteps`)
+
+A numbered process. **What the steps do** (the title), **Total time in minutes** (optional, whole minutes, shown as "about 2 minutes") and the **Steps** (a name and what to do; at least 2). Its fields also make the page's HowTo markup:
+
+```ts
+import { STEPS_TYPE, stepsHowTo } from "emdash-folio/steps";
+const howTo = node ? stepsHowTo(node) : null; // @type HowTo, name, totalTime (PT2M), step[]
+```
+
+No title or fewer than 2 steps, no HowTo. Whether Google shows anything for HowTo is Google's call.
+
+### Callout (`folioCallout`)
+
+**Kind**: Tip (non obvious advice), Warning (a real risk) or Insight (a standout finding), each with its own colour and default title ("Tip", "Watch out", "What we found"). **Title** (optional) and **Text**.
+
+### Metric cards (`folioMetrics`)
+
+2 to 4 headline numbers. Each **card** has a number, what it is, and optional context; a card missing the number or the label is skipped. **Source** and **Source link** go under the cards. Two cards across on phones.
+
+### Timeline (`folioTimeline`)
+
+Dated events, shown in the order typed (dates are shown as written, never sorted or guessed). Each **event** has a date, what happened, and optional detail. Dates sit beside the line on wide screens and above each event on phones.
+
+### Table (`folioTable`)
+
+**Rows** pasted like chart data (CSV, tabs from a spreadsheet, or semicolons). The first row names the columns and the first column names the rows. 2 to 5 columns (keep to 4 unless every cell is very short) and up to 50 rows. **Column to highlight** marks one column as the pick. **Caption** goes under the table. On phones every row becomes a card whose cells carry their column name, so nothing scrolls sideways. A table that can't be shown says why.
+
+### Pros and cons (`folioProsCons`)
+
+**Pros** and **Cons**, one per line, with optional headings (default "What's good" and "What's not"). Shown only when both lists have items.
+
+### Verdict (`folioVerdict`)
+
+A stated position for comparisons and best lists (reviews use the review snapshot): **Our pick** in one sentence (required), **Why**, and **The catch**. Optional label (default "Our verdict").
+
+### Choose A or B (`folioChoose`)
+
+Two cards: each option's name ("Choose {name} if") and its reasons, one per line. Both sides need reasons.
+
+### Who it's for (`folioAudience`)
+
+**Good for** and **Not for** lists, one per line, with optional headings. The "not for" list is required: a block without it isn't shown.

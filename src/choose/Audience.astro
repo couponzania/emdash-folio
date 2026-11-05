@@ -1,0 +1,14 @@
+---
+// The "who it's for" block on the page.
+import Pair from "./Pair.astro";
+import { audienceData } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const d = audienceData(Astro.props.node);
+if (!d.show) console.warn(`[folio] audience ${Astro.props.node._key} not shown: it needs both lists`);
+---
+
+{d.show && <Pair data={d} label="Who it's for" variant="audience" />}

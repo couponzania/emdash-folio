@@ -1,0 +1,49 @@
+---
+// The table block on the page: a real table on wide screens; on phones each row becomes a card
+// whose cells carry their column name. A table that can't be shown says why.
+import "../styles/folio.css";
+import "../styles/blocks.css";
+import { tableModel } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const t = tableModel(Astro.props.node);
+if (!t.ok) console.warn(`[folio] table ${Astro.props.node._key} not shown: ${t.reason}`);
+---
+
+{
+	!t.ok ? (
+		<p class="folio folio-chart__error">{`Table not shown: ${t.reason}`}</p>
+	) : (
+		<figure class="folio folio-table">
+			<div class="folio-table__scroll">
+				<table>
+					{t.caption && <caption>{t.caption}</caption>}
+					<thead>
+						<tr>
+							{t.head.map((h, i) => (
+								<th scope="col" class:list={[i === t.pick && "is-pick"]}>
+									{h}
+								</th>
+							))}
+						</tr>
+					</thead>
+					<tbody>
+						{t.rows.map((r) => (
+							<tr>
+								<th scope="row">{r.name}</th>
+								{r.cells.map((c, i) => (
+									<td data-label={t.head[i + 1]} class:list={[i + 1 === t.pick && "is-pick"]}>
+										{c}
+									</td>
+								))}
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		</figure>
+	)
+}

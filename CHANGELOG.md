@@ -2,6 +2,13 @@
 
 Every change to Folio gets an entry and a version bump (semver), released as a `v{version}` tag. The version lives in `package.json` and `FOLIO_VERSION` in `src/plugin.js`; a test fails if they or this file disagree.
 
+## 0.5.0 (2026-11-05)
+
+- Ten new blocks, all server rendered with fields: **TL;DR** (`folioTldr`), **Steps** (`folioSteps`), **Callout** (`folioCallout`: tip, warning, insight), **Metric cards** (`folioMetrics`), **Timeline** (`folioTimeline`), **Table** (`folioTable`), **Pros and cons** (`folioProsCons`), **Verdict** (`folioVerdict`), **Choose A or B** (`folioChoose`) and **Who it's for** (`folioAudience`). Layouts as approved in the 2026-11-05 mockup; phones get stacked cards, and the table turns each row into a card.
+- `stepsHowTo()` in the new entry `emdash-folio/steps` builds HowTo markup from the steps block, so the page and its schema can't disagree.
+- Lists are typed one item per line (`lines()`), with habit bullets removed. Pasted rows for the chart and the table share one parser (`src/shared/grid.ts`); the chart reads them as before.
+- New styles live in `src/styles/blocks.css`, using only the existing `--folio-*` variables.
+
 ## 0.4.0 (2026-11-05)
 
 - Folio moves to its own repository (`couponzania/emdash-folio`, MIT licence) with its own tests, type check and CI. History from the site's `emdash/packages/folio` is kept.

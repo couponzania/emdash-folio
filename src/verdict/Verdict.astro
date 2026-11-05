@@ -1,0 +1,27 @@
+---
+// The verdict block on the page: a dark card with the pick, why, and the catch. No pick, nothing.
+import "../styles/folio.css";
+import "../styles/blocks.css";
+import { verdictData } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const d = verdictData(Astro.props.node);
+---
+
+{
+	d.pick && (
+		<section class="folio folio-verdict" aria-label={d.kicker}>
+			<p class="folio-kicker">{d.kicker}</p>
+			<p class="folio-verdict__pick">{d.pick}</p>
+			{d.why && <p class="folio-verdict__why">{d.why}</p>}
+			{d.catch && (
+				<p class="folio-verdict__but">
+					<strong>The catch:</strong> {d.catch}
+				</p>
+			)}
+		</section>
+	)
+}

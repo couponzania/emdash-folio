@@ -1,0 +1,14 @@
+---
+// The "choose A or B" block on the page.
+import Pair from "./Pair.astro";
+import { chooseData } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const d = chooseData(Astro.props.node);
+if (!d.show) console.warn(`[folio] choose ${Astro.props.node._key} not shown: it needs reasons for both options`);
+---
+
+{d.show && <Pair data={d} label="Which to choose" variant="choose" />}

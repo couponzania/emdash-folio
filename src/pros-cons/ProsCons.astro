@@ -1,0 +1,36 @@
+---
+// The pros and cons block on the page: two panels side by side, stacked on phones.
+import "../styles/folio.css";
+import "../styles/blocks.css";
+import { prosConsData } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const d = prosConsData(Astro.props.node);
+if (!d.show) console.warn(`[folio] pros and cons ${Astro.props.node._key} not shown: it needs both lists`);
+---
+
+{
+	d.show && (
+		<section class="folio folio-pc" aria-label="Pros and cons">
+			<div class="folio-pc__col folio-pc__pros">
+				<p class="folio-pc__title">{d.prosTitle}</p>
+				<ul>
+					{d.pros.map((p) => (
+						<li>{p}</li>
+					))}
+				</ul>
+			</div>
+			<div class="folio-pc__col folio-pc__cons">
+				<p class="folio-pc__title">{d.consTitle}</p>
+				<ul>
+					{d.cons.map((c) => (
+						<li>{c}</li>
+					))}
+				</ul>
+			</div>
+		</section>
+	)
+}

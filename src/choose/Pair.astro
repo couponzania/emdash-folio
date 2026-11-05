@@ -1,0 +1,30 @@
+---
+// Two cards side by side (stacked on phones), shared by "choose A or B" and "who it's for".
+import "../styles/folio.css";
+import "../styles/blocks.css";
+import type { PairData } from "./rules.ts";
+
+interface Props {
+	data: PairData;
+	label: string;
+	variant: "choose" | "audience";
+}
+
+const { data, label, variant } = Astro.props;
+const mods = variant === "choose" ? ["a", "b"] : ["yes", "no"];
+---
+
+<section class="folio folio-pair" aria-label={label}>
+	{
+		[data.first, data.second].map((card, i) => (
+			<div class:list={["folio-pair__card", `folio-pair__card--${mods[i]}`]}>
+				{card.title && <p class="folio-pair__title">{card.title}</p>}
+				<ul>
+					{card.items.map((item) => (
+						<li>{item}</li>
+					))}
+				</ul>
+			</div>
+		))
+	}
+</section>

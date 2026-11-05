@@ -1,6 +1,6 @@
 {
   "name": "emdash-folio",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Article blocks for EmDash: editor blocks with fields, rendered on the server.",
   "type": "module",
   "license": "MIT",
@@ -11,7 +11,14 @@
   },
   "homepage": "https://github.com/couponzania/emdash-folio#readme",
   "bugs": "https://github.com/couponzania/emdash-folio/issues",
-  "keywords": ["emdash", "emdash-plugin", "astro", "portable-text", "blocks", "charts"],
+  "keywords": [
+    "emdash",
+    "emdash-plugin",
+    "astro",
+    "portable-text",
+    "blocks",
+    "charts"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./plugin": {
@@ -20,10 +27,16 @@
     },
     "./blocks": "./src/blocks.ts",
     "./review-snapshot": "./src/review-snapshot/index.ts",
+    "./steps": "./src/steps/index.ts",
     "./styles.css": "./src/styles/folio.css",
     "./package.json": "./package.json"
   },
-  "files": ["src", "README.md", "CHANGELOG.md", "LICENSE"],
+  "files": [
+    "src",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=22.18.0"
   },

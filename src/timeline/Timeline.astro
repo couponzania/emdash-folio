@@ -1,0 +1,32 @@
+---
+// The timeline block on the page: dates on the left of a line with a dot per event; on phones the
+// dates sit above each event.
+import "../styles/folio.css";
+import "../styles/blocks.css";
+import { timelineData } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const d = timelineData(Astro.props.node);
+---
+
+{
+	d.events.length > 0 && (
+		<section class="folio folio-box" aria-label={d.title || "Timeline"}>
+			{d.title && <p class="folio-h">{d.title}</p>}
+			<ol class="folio-timeline">
+				{d.events.map((e) => (
+					<li>
+						<span class="folio-timeline__date">{e.date}</span>
+						<div class="folio-timeline__body">
+							<p class="folio-timeline__title">{e.title}</p>
+							{e.text && <p class="folio-timeline__text">{e.text}</p>}
+						</div>
+					</li>
+				))}
+			</ol>
+		</section>
+	)
+}

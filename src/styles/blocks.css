@@ -1,0 +1,591 @@
+/* Folio blocks: TL;DR, steps, callout, metric cards, timeline, table, pros and cons, verdict,
+   choose A or B, who it's for. Colours and sizes only through --folio-* variables (folio.css). */
+
+/* Shared box */
+.folio.folio-box {
+	padding: 1.25rem 1.35rem;
+	border: 1px solid var(--folio-border);
+	border-radius: var(--folio-radius-lg);
+	background: var(--folio-surface);
+}
+
+.folio .folio-kicker {
+	margin: 0 0 0.6rem;
+	color: var(--folio-text-muted);
+	font-size: 0.78rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.folio .folio-h {
+	margin: 0 0 0.75rem;
+	font-size: 1.05rem;
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+/* TL;DR */
+.folio.folio-tldr {
+	padding: 1.15rem 1.35rem;
+	border-left: 4px solid var(--folio-accent);
+	border-radius: 0 var(--folio-radius) var(--folio-radius) 0;
+	background: var(--folio-fill);
+}
+
+.folio .folio-tldr__list {
+	display: grid;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.folio .folio-tldr__list li {
+	position: relative;
+	margin: 0;
+	padding-left: 1.2rem;
+	line-height: 1.5;
+}
+
+.folio .folio-tldr__list li::before {
+	content: "";
+	position: absolute;
+	top: 0.6em;
+	left: 0;
+	width: 0.45rem;
+	height: 0.45rem;
+	border-radius: 50%;
+	background: var(--folio-accent);
+}
+
+/* Steps */
+.folio .folio-steps {
+	display: grid;
+	gap: 0;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: folio-step;
+}
+
+.folio .folio-steps > li {
+	position: relative;
+	display: grid;
+	grid-template-columns: 2.25rem 1fr;
+	gap: 0 0.9rem;
+	margin: 0;
+	padding: 0 0 1.25rem;
+	counter-increment: folio-step;
+}
+
+.folio .folio-steps > li::before {
+	content: counter(folio-step);
+	display: grid;
+	place-items: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	border-radius: 50%;
+	background: var(--folio-dark);
+	color: var(--folio-on-accent);
+	font-weight: 700;
+}
+
+.folio .folio-steps > li:not(:last-child)::after {
+	content: "";
+	position: absolute;
+	top: 2.5rem;
+	bottom: 0.25rem;
+	left: calc(1.125rem - 1px);
+	width: 2px;
+	background: var(--folio-border);
+}
+
+.folio .folio-steps__name {
+	margin: 0.4rem 0 0.25rem;
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+.folio .folio-steps__text {
+	grid-column: 2;
+	margin: 0;
+	color: var(--folio-text-2);
+	line-height: 1.55;
+}
+
+.folio .folio-steps__meta {
+	color: var(--folio-text-muted);
+	font-size: 0.85rem;
+	font-weight: 400;
+}
+
+/* Callout */
+.folio.folio-callout {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 0.75rem;
+	padding: 1rem 1.15rem;
+	border-radius: var(--folio-radius);
+	background: var(--folio-expected-fill);
+	line-height: 1.55;
+}
+
+.folio .folio-callout__icon {
+	display: grid;
+	place-items: center;
+	width: 1.75rem;
+	height: 1.75rem;
+	border-radius: 50%;
+	background: var(--folio-accent);
+	color: var(--folio-on-accent);
+	font-size: 0.95rem;
+	font-weight: 700;
+}
+
+.folio .folio-callout__title {
+	display: block;
+	margin-bottom: 0.15rem;
+	font-weight: 600;
+}
+
+.folio.folio-callout p {
+	margin: 0;
+}
+
+.folio.folio-callout--warning {
+	background: var(--folio-warn-fill);
+}
+
+.folio.folio-callout--warning .folio-callout__icon {
+	background: var(--folio-warn);
+}
+
+.folio.folio-callout--insight {
+	background: var(--folio-fill);
+}
+
+.folio.folio-callout--insight .folio-callout__icon {
+	background: var(--folio-dark);
+}
+
+/* Metric cards */
+.folio.folio-metrics {
+	margin: 1.75rem 0;
+}
+
+.folio .folio-metrics__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+	gap: 0.75rem;
+	margin: 0;
+}
+
+.folio .folio-metrics__card {
+	display: flex;
+	flex-direction: column-reverse;
+	justify-content: flex-end;
+	padding: 1rem 1.1rem;
+	border: 1px solid var(--folio-border);
+	border-radius: var(--folio-radius);
+	background: var(--folio-surface);
+}
+
+.folio .folio-metrics__card dd {
+	margin: 0;
+	color: var(--folio-accent);
+	font-size: 1.9rem;
+	font-weight: 700;
+	line-height: 1.1;
+	font-variant-numeric: tabular-nums;
+}
+
+.folio .folio-metrics__card dt {
+	margin-top: 0.35rem;
+	color: var(--folio-text);
+	font-size: 0.92rem;
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+.folio .folio-metrics__card small {
+	display: block;
+	margin-top: 0.25rem;
+	color: var(--folio-text-muted);
+	font-size: 0.8rem;
+	font-weight: 400;
+}
+
+.folio .folio-foot {
+	margin: 0.6rem 0 0;
+	color: var(--folio-text-muted);
+	font-size: 0.82rem;
+}
+
+.folio .folio-foot a {
+	color: var(--folio-link);
+}
+
+/* Timeline */
+.folio .folio-timeline {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.folio .folio-timeline > li {
+	position: relative;
+	display: grid;
+	grid-template-columns: 7.5rem 1fr;
+	gap: 0 1.5rem;
+	margin: 0;
+	padding: 0 0 1.1rem;
+}
+
+.folio .folio-timeline > li::before {
+	content: "";
+	position: absolute;
+	top: 0.35rem;
+	left: calc(7.5rem + 0.75rem - 5px);
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--folio-accent);
+	box-shadow: 0 0 0 3px var(--folio-surface);
+	z-index: 1;
+}
+
+.folio .folio-timeline > li::after {
+	content: "";
+	position: absolute;
+	top: 0.35rem;
+	bottom: -0.35rem;
+	left: calc(7.5rem + 0.75rem - 1px);
+	width: 2px;
+	background: var(--folio-border);
+}
+
+.folio .folio-timeline > li:last-child::after {
+	display: none;
+}
+
+.folio .folio-timeline__date {
+	color: var(--folio-text-muted);
+	font-size: 0.88rem;
+	font-weight: 600;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+.folio .folio-timeline__body {
+	padding-left: 0.5rem;
+}
+
+.folio .folio-timeline__title {
+	margin: 0;
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+.folio .folio-timeline__text {
+	margin: 0.2rem 0 0;
+	color: var(--folio-text-2);
+	font-size: 0.95rem;
+	line-height: 1.5;
+}
+
+/* Table */
+.folio.folio-table {
+	margin: 1.75rem 0;
+}
+
+.folio .folio-table__scroll {
+	border: 1px solid var(--folio-border);
+	border-radius: var(--folio-radius);
+	overflow: hidden;
+	background: var(--folio-surface);
+}
+
+.folio.folio-table table {
+	width: 100%;
+	margin: 0;
+	border-collapse: collapse;
+	font-size: 0.95rem;
+	line-height: 1.45;
+}
+
+.folio.folio-table th,
+.folio.folio-table td {
+	padding: 0.7rem 0.9rem;
+	border-top: 1px solid var(--folio-border);
+	text-align: left;
+	vertical-align: top;
+}
+
+.folio.folio-table thead th {
+	border-top: 0;
+	background: var(--folio-fill);
+	color: var(--folio-text-2);
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+
+.folio.folio-table tbody th {
+	font-weight: 600;
+}
+
+.folio.folio-table .is-pick {
+	background: var(--folio-expected-fill);
+}
+
+.folio.folio-table thead .is-pick {
+	color: var(--folio-expected-text);
+}
+
+.folio.folio-table caption {
+	caption-side: bottom;
+	padding-top: 0.6rem;
+	color: var(--folio-text-muted);
+	font-size: 0.82rem;
+	text-align: left;
+}
+
+/* Pros and cons */
+.folio.folio-pc {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.75rem;
+}
+
+.folio .folio-pc__col {
+	padding: 1rem 1.1rem;
+	border-radius: var(--folio-radius);
+	background: var(--folio-fill);
+}
+
+.folio .folio-pc__title {
+	font-weight: 700;
+	margin: 0 0 0.6rem;
+	font-size: 0.95rem;
+}
+
+.folio .folio-pc__col ul {
+	display: grid;
+	gap: 0.45rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.folio .folio-pc__col li {
+	display: grid;
+	grid-template-columns: 1.1rem 1fr;
+	gap: 0.5rem;
+	margin: 0;
+	line-height: 1.45;
+}
+
+.folio .folio-pc__col li::before {
+	font-weight: 700;
+}
+
+.folio .folio-pc__pros .folio-pc__title {
+	color: var(--folio-live);
+}
+
+.folio .folio-pc__pros li::before {
+	content: "+";
+	color: var(--folio-live);
+}
+
+.folio .folio-pc__cons .folio-pc__title {
+	color: var(--folio-warn);
+}
+
+.folio .folio-pc__cons li::before {
+	content: "\2212";
+	color: var(--folio-warn);
+}
+
+/* Verdict */
+.folio.folio-verdict {
+	padding: 1.35rem 1.5rem;
+	border-radius: var(--folio-radius-lg);
+	background: var(--folio-dark);
+	color: var(--folio-on-accent);
+}
+
+.folio.folio-verdict .folio-kicker {
+	color: inherit;
+	opacity: 0.7;
+}
+
+.folio .folio-verdict__pick {
+	margin: 0;
+	font-size: 1.3rem;
+	font-weight: 700;
+	line-height: 1.3;
+}
+
+.folio .folio-verdict__why {
+	margin: 0.5rem 0 0;
+	line-height: 1.55;
+	opacity: 0.92;
+}
+
+.folio .folio-verdict__but {
+	margin: 0.9rem 0 0;
+	padding-top: 0.9rem;
+	border-top: 1px solid rgba(255, 255, 255, 0.18);
+	font-size: 0.95rem;
+	line-height: 1.5;
+}
+
+.folio .folio-verdict__but strong {
+	color: inherit;
+}
+
+/* Choose A or B, and Who it's for: two cards side by side */
+.folio.folio-pair {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.75rem;
+}
+
+.folio .folio-pair__card {
+	padding: 1.1rem 1.2rem;
+	border: 1px solid var(--folio-border);
+	border-radius: var(--folio-radius);
+	background: var(--folio-surface);
+}
+
+.folio .folio-pair__title {
+	font-weight: 700;
+	margin: 0 0 0.6rem;
+	font-size: 1rem;
+	line-height: 1.35;
+}
+
+.folio .folio-pair__card ul {
+	display: grid;
+	gap: 0.4rem;
+	margin: 0;
+	padding-left: 1.1rem;
+	line-height: 1.45;
+}
+
+.folio .folio-pair__card li {
+	margin: 0;
+}
+
+.folio .folio-pair__card--a {
+	border-top: 4px solid var(--folio-series-1);
+}
+
+.folio .folio-pair__card--b {
+	border-top: 4px solid var(--folio-series-2);
+}
+
+.folio .folio-pair__card--yes {
+	border-top: 4px solid var(--folio-live);
+}
+
+.folio .folio-pair__card--no {
+	border-top: 4px solid var(--folio-warn);
+	background: var(--folio-fill);
+}
+
+@media (max-width: 640px) {
+	.folio.folio-pc,
+	.folio.folio-pair {
+		grid-template-columns: 1fr;
+	}
+
+	.folio .folio-timeline > li {
+		grid-template-columns: 1fr;
+		padding-left: 1.5rem;
+	}
+
+	.folio .folio-timeline > li::before {
+		left: 0;
+	}
+
+	.folio .folio-timeline > li::after {
+		left: 4px;
+	}
+
+	.folio .folio-timeline__date {
+		text-align: left;
+	}
+
+	.folio .folio-timeline__body {
+		padding-left: 0;
+	}
+
+	.folio .folio-metrics__grid {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.folio .folio-metrics__card dd {
+		font-size: 1.5rem;
+	}
+
+	/* Table: one card per row, like the sale calendar */
+	.folio .folio-table__scroll {
+		border: 0;
+		background: none;
+	}
+
+	.folio.folio-table thead {
+		display: none;
+	}
+
+	.folio.folio-table table,
+	.folio.folio-table tbody,
+	.folio.folio-table tr,
+	.folio.folio-table th,
+	.folio.folio-table td {
+		display: block;
+	}
+
+	.folio.folio-table tbody tr {
+		margin-bottom: 0.6rem;
+		border: 1px solid var(--folio-border);
+		border-radius: var(--folio-radius);
+		background: var(--folio-surface);
+		overflow: hidden;
+	}
+
+	.folio.folio-table tbody th {
+		border-top: 0;
+		background: var(--folio-fill);
+	}
+
+	.folio.folio-table td {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		text-align: right;
+	}
+
+	.folio.folio-table td::before {
+		content: attr(data-label);
+		color: var(--folio-text-muted);
+		font-size: 0.85rem;
+		text-align: left;
+	}
+}
+
+@media (max-width: 640px) {
+	/* The caption follows the cards, full width. */
+	.folio.folio-table table {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.folio.folio-table caption {
+		display: block;
+		order: 1;
+		padding-top: 0;
+	}
+}

@@ -6,11 +6,21 @@
 // variables, which a site can set (or map to its own tokens).
 import { definePlugin } from "emdash";
 
+import { calloutBlock } from "./callout/block.ts";
 import { chartBlock } from "./chart/block.ts";
+import { audienceBlock } from "./choose/audience-block.ts";
+import { chooseBlock } from "./choose/block.ts";
+import { metricsBlock } from "./metrics/block.ts";
 import { FOLIO_PLUGIN_ID, FOLIO_VERSION } from "./plugin.js";
+import { prosConsBlock } from "./pros-cons/block.ts";
 import { snapshotBlock } from "./review-snapshot/block.ts";
 import { saleCalendarBlock } from "./sale-calendar/block.ts";
 import { setFolioOptions } from "./shared/options.ts";
+import { stepsBlock } from "./steps/block.ts";
+import { tableBlock } from "./table/block.ts";
+import { timelineBlock } from "./timeline/block.ts";
+import { tldrBlock } from "./tldr/block.ts";
+import { verdictBlock } from "./verdict/block.ts";
 
 export { FOLIO_PLUGIN_ID, FOLIO_VERSION };
 
@@ -21,7 +31,21 @@ export function createPlugin(options: unknown = {}) {
 		id: FOLIO_PLUGIN_ID,
 		version: FOLIO_VERSION,
 		admin: {
-			portableTextBlocks: [saleCalendarBlock, snapshotBlock, chartBlock],
+			portableTextBlocks: [
+				tldrBlock,
+				stepsBlock,
+				calloutBlock,
+				metricsBlock,
+				chartBlock,
+				tableBlock,
+				timelineBlock,
+				prosConsBlock,
+				verdictBlock,
+				chooseBlock,
+				audienceBlock,
+				snapshotBlock,
+				saleCalendarBlock,
+			],
 		},
 	});
 }

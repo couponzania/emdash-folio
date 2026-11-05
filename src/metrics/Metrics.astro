@@ -1,0 +1,42 @@
+---
+// The metric cards block on the page: big numbers in a grid, two across on phones, and the source.
+import "../styles/folio.css";
+import "../styles/blocks.css";
+import { metricsData } from "./rules.ts";
+
+interface Props {
+	node: Record<string, unknown> & { _type: string; _key: string };
+}
+
+const d = metricsData(Astro.props.node);
+---
+
+{
+	d.cards.length > 0 && (
+		<section class="folio folio-metrics" aria-label="Key numbers">
+			<dl class="folio-metrics__grid">
+				{d.cards.map((c) => (
+					<div class="folio-metrics__card">
+						<dt>
+							{c.label}
+							{c.context && <small>{c.context}</small>}
+						</dt>
+						<dd>{c.value}</dd>
+					</div>
+				))}
+			</dl>
+			{d.source && (
+				<p class="folio-foot">
+					Source:{" "}
+					{d.source.href ? (
+						<a href={d.source.href} rel={/^https?:/i.test(d.source.href) ? "noopener" : undefined}>
+							{d.source.name}
+						</a>
+					) : (
+						d.source.name
+					)}
+				</p>
+			)}
+		</section>
+	)
+}

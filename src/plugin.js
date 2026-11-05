@@ -7,7 +7,7 @@
 // files inside node_modules. Types are in plugin.d.ts.
 
 export const FOLIO_PLUGIN_ID = "folio";
-export const FOLIO_VERSION = "0.4.0";
+export const FOLIO_VERSION = "0.5.0";
 
 /**
  * The EmDash plugin descriptor for Folio (native format).

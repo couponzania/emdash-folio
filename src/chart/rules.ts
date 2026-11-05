@@ -2,6 +2,7 @@
 // lay out each kind: bars as HTML rows, a line as a stretched SVG plot with HTML labels, a donut
 // as SVG arcs. All positions come from fixed formulas, so they can be tested.
 import { safeHref, text } from "../shared/fields.ts";
+import { parseGrid } from "../shared/grid.ts";
 
 export const CHART_KINDS = ["bar", "line", "donut"] as const;
 export type ChartKind = (typeof CHART_KINDS)[number];
@@ -36,38 +37,7 @@ export interface ChartError {
 
 /** A table pasted as CSV, from a spreadsheet (tabs) or with semicolons. The first row names the columns. */
 export function parseTable(input: string): { columns: string[]; rows: Array<Record<string, string>> } {
-	const lines = input.replace(/\r\n?/g, "\n").split("\n");
-	const header = lines.find((l) => l.trim() !== "") ?? "";
-	const sep = header.includes("\t") ? "\t" : header.includes(";") && !header.includes(",") ? ";" : ",";
-	const records: string[][] = [];
-	let row: string[] = [];
-	let cell = "";
-	let quoted = false;
-	const text = input.replace(/\r\n?/g, "\n");
-	for (let i = 0; i < text.length; i++) {
-		const ch = text[i];
-		if (quoted) {
-			if (ch === '"' && text[i + 1] === '"') {
-				cell += '"';
-				i++;
-			} else if (ch === '"') quoted = false;
-			else cell += ch;
-		} else if (ch === '"' && cell.trim() === "") {
-			quoted = true;
-			cell = "";
-		} else if (ch === sep) {
-			row.push(cell.trim());
-			cell = "";
-		} else if (ch === "\n") {
-			row.push(cell.trim());
-			records.push(row);
-			row = [];
-			cell = "";
-		} else cell += ch;
-	}
-	row.push(cell.trim());
-	records.push(row);
-	const filled = records.filter((r) => r.some((c) => c !== ""));
+	const filled = parseGrid(input);
 	if (filled.length === 0) return { columns: [], rows: [] };
 	const columns = filled[0];
 	return { columns, rows: filled.slice(1).map((r) => Object.fromEntries(columns.map((c, i) => [c, r[i] ?? ""]))) };
