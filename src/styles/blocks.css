@@ -344,7 +344,8 @@
 
 .folio.folio-table caption {
 	caption-side: bottom;
-	padding-top: 0.6rem;
+	padding: 0.6rem 0.9rem;
+	border-top: 1px solid var(--folio-border);
 	color: var(--folio-text-muted);
 	font-size: 0.82rem;
 	text-align: left;
@@ -470,12 +471,28 @@
 	display: grid;
 	gap: 0.4rem;
 	margin: 0;
-	padding-left: 1.1rem;
+	padding: 0;
+	list-style: none;
 	line-height: 1.45;
 }
 
+/* Our own markers: host sites often reset list styles. */
 .folio .folio-pair__card li {
+	position: relative;
 	margin: 0;
+	padding-left: 1.1rem;
+	list-style: none;
+}
+
+.folio .folio-pair__card li::before {
+	content: "";
+	position: absolute;
+	top: 0.6em;
+	left: 0.15rem;
+	width: 0.4rem;
+	height: 0.4rem;
+	border-radius: 50%;
+	background: var(--folio-text-muted);
 }
 
 .folio .folio-pair__card--a {
@@ -586,6 +603,7 @@
 	.folio.folio-table caption {
 		display: block;
 		order: 1;
-		padding-top: 0;
+		padding: 0;
+		border-top: 0;
 	}
 }
