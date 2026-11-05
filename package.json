@@ -1,16 +1,47 @@
 {
   "name": "emdash-folio",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Article blocks for EmDash: editor blocks with fields, rendered on the server.",
-  "private": true,
   "type": "module",
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "author": "CouponZania",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/couponzania/emdash-folio.git"
+  },
+  "homepage": "https://github.com/couponzania/emdash-folio#readme",
+  "bugs": "https://github.com/couponzania/emdash-folio/issues",
+  "keywords": ["emdash", "emdash-plugin", "astro", "portable-text", "blocks", "charts"],
   "exports": {
     ".": "./src/index.ts",
-    "./blocks": "./src/blocks.ts"
+    "./plugin": {
+      "types": "./src/plugin.d.ts",
+      "default": "./src/plugin.js"
+    },
+    "./blocks": "./src/blocks.ts",
+    "./review-snapshot": "./src/review-snapshot/index.ts",
+    "./styles.css": "./src/styles/folio.css",
+    "./package.json": "./package.json"
+  },
+  "files": ["src", "README.md", "CHANGELOG.md", "LICENSE"],
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "typecheck": "astro check"
   },
   "peerDependencies": {
     "astro": ">=7.3.0",
     "emdash": ">=1.4.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@astrojs/react": "^7.0.0",
+    "astro": "^7.4.2",
+    "emdash": "^1.4.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "typescript": "^6.0.3"
   }
 }

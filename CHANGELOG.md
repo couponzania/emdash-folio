@@ -1,6 +1,15 @@
 # Changelog
 
-Every change to Folio gets an entry and a version bump (semver). Version lives in `package.json` and `FOLIO_VERSION` in `src/index.ts`; keep them equal.
+Every change to Folio gets an entry and a version bump (semver), released as a `v{version}` tag. The version lives in `package.json` and `FOLIO_VERSION` in `src/plugin.js`; a test fails if they or this file disagree.
+
+## 0.4.0 (2026-11-05)
+
+- Folio moves to its own repository (`couponzania/emdash-folio`, MIT licence) with its own tests, type check and CI. History from the site's `emdash/packages/folio` is kept.
+- **`folioPlugin(options)`** (`emdash-folio/plugin`): the plugin descriptor, so a site registers Folio by package name (`entrypoint: "emdash-folio"`, `componentsEntry: "emdash-folio/blocks"`) instead of file paths. Plain JavaScript, so the Astro config can import it from `node_modules`.
+- **`paidLinks` option** (breaking): which link prefixes count as paid links. A snapshot button under one gets `rel="sponsored nofollow noopener noreferrer"`. Default: none (before, `/go/` and every other site were always paid). To keep the old behaviour, pass `paidLinks: ["/go/", "http://", "https://"]`.
+- New entry `emdash-folio/review-snapshot` (`SNAPSHOT_TYPE`, `snapshotReview()`, `snapshotData()`, `parseScore()`) for building Review markup, and `emdash-folio/styles.css`.
+- The default `--folio-*` variables sit under `:where(.folio)`, so a site overrides one with a plain `.folio { … }` rule. Nothing looks different.
+- The snapshot button link placeholder no longer names a site path.
 
 ## 0.3.0 (2026-11-05)
 

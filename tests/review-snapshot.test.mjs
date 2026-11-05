@@ -89,10 +89,13 @@ test("snapshotReview: nothing without a reviewed item's name or a score", () => 
 	assert.equal(snapshotReview(node({ score: "", scores: [] })), null);
 });
 
-test("buttonRel: /go/ redirects and other sites are paid links; page anchors and paths are not", async () => {
+test("buttonRel: links under the site's paid prefixes are paid links; others are not", async () => {
 	const { buttonRel } = await import("../src/shared/fields.ts");
-	assert.equal(buttonRel("/go/scala-hosting"), "sponsored nofollow noopener noreferrer");
-	assert.equal(buttonRel("https://example.com"), "sponsored nofollow noopener noreferrer");
-	assert.equal(buttonRel("/stores/scalahosting.com"), undefined);
-	assert.equal(buttonRel("#pricing"), undefined);
+	const paid = ["/go/", "http://", "https://"];
+	assert.equal(buttonRel("/go/scala-hosting", paid), "sponsored nofollow noopener noreferrer");
+	assert.equal(buttonRel("HTTPS://example.com", paid), "sponsored nofollow noopener noreferrer");
+	assert.equal(buttonRel("/stores/scalahosting.com", paid), undefined);
+	assert.equal(buttonRel("#pricing", paid), undefined);
+	assert.equal(buttonRel("/go/scala-hosting", []), undefined, "no prefixes, no paid links");
+	assert.equal(buttonRel("/go/x", [""]), undefined, "an empty prefix matches nothing");
 });

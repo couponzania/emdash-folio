@@ -10,11 +10,12 @@ export function safeHref(v: unknown): string {
 }
 
 /**
- * rel for a button that can lead to a shop: the host's /go/ redirects and links to other sites
- * are treated as paid links, as the host site marks its own offer links. Undefined otherwise.
+ * rel for a button whose link starts with one of the site's paid link prefixes (the
+ * `paidLinks` option, e.g. ["/go/", "https://"]): marked as a paid link. Undefined otherwise.
  */
-export function buttonRel(href: string): string | undefined {
-	return /^(\/go\/|https?:\/\/)/i.test(href) ? "sponsored nofollow noopener noreferrer" : undefined;
+export function buttonRel(href: string, paidLinks: readonly string[]): string | undefined {
+	const h = href.toLowerCase();
+	return paidLinks.some((p) => p !== "" && h.startsWith(p.toLowerCase())) ? "sponsored nofollow noopener noreferrer" : undefined;
 }
 
 /** A block field that holds a list of rows (a repeater), as plain objects. */

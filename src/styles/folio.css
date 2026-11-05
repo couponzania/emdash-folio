@@ -1,7 +1,8 @@
-/* Folio blocks. Every colour and size comes from a --folio-* variable, which falls back to the
-   host site's --cz-* token and then to a plain value, so Folio works on its own and matches
-   the site it sits in. Light only, like the site. */
-.folio {
+/* Folio blocks. Every colour and size comes from a --folio-* variable. The defaults below sit
+   under :where(), so a site overrides any of them with a plain `.folio { --folio-accent: … }`.
+   Each default first tries a --cz-* token (the original host's names), then a plain value.
+   Light only. */
+:where(.folio) {
 	--folio-text: var(--cz-text, #1d1d1f);
 	--folio-text-muted: var(--cz-text-muted, #636b78);
 	--folio-surface: var(--cz-surface, #fff);
@@ -31,7 +32,9 @@
 	--folio-series-4: #d55e00;
 	--folio-series-5: #cc79a7;
 	--folio-series-6: #6b7280;
+}
 
+.folio {
 	margin: 1.75rem 0;
 	color: var(--folio-text);
 }

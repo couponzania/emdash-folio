@@ -3,6 +3,7 @@
 // skip it, when it was checked, and up to two links. Server rendered, no script.
 import "../styles/folio.css";
 import { buttonRel } from "../shared/fields.ts";
+import { folioOptions } from "../shared/options.ts";
 import { snapshotData } from "./rules.ts";
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 
 const d = snapshotData(Astro.props.node);
 const show = d.verdict !== "" || d.score !== null;
+const { paidLinks } = folioOptions();
 ---
 
 {
@@ -73,12 +75,12 @@ const show = d.verdict !== "" || d.score !== null;
 					{(d.cta || d.more) && (
 						<p class="folio-snap__actions">
 							{d.cta && (
-								<a class="folio-snap__cta" href={d.cta.href} rel={buttonRel(d.cta.href)}>
+								<a class="folio-snap__cta" href={d.cta.href} rel={buttonRel(d.cta.href, paidLinks)}>
 									{d.cta.label}
 								</a>
 							)}
 							{d.more && (
-								<a class="folio-snap__more" href={d.more.href} rel={buttonRel(d.more.href)}>
+								<a class="folio-snap__more" href={d.more.href} rel={buttonRel(d.more.href, paidLinks)}>
 									{d.more.label}
 								</a>
 							)}

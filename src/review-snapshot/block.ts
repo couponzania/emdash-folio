@@ -54,7 +54,7 @@ export const snapshotBlock: PortableTextBlockConfig = {
 		{ type: "text_input", action_id: "checked", label: "Checked (month and year)", placeholder: "November 2026" },
 		{ type: "text_input", action_id: "note", label: "Note beside the date (optional)", placeholder: "30 day money back" },
 		{ type: "text_input", action_id: "ctaLabel", label: "Main button text (optional)", placeholder: "Check Current Price" },
-		{ type: "text_input", action_id: "ctaLink", label: "Main button link", placeholder: "/go/scala-hosting" },
+		{ type: "text_input", action_id: "ctaLink", label: "Main button link", placeholder: "https://example.com/plans" },
 		{ type: "text_input", action_id: "moreLabel", label: "Second link text (optional)", placeholder: "See all plans" },
 		{ type: "text_input", action_id: "moreLink", label: "Second link", placeholder: "#pricing" },
 	],
