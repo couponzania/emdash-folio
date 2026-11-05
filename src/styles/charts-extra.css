@@ -1,0 +1,359 @@
+/* Folio chart types added in 0.7: scatter, histogram, heatmap, funnel, waterfall, bars plus a
+   line; and bars below zero and grouped columns. Only --folio-* variables (folio.css). */
+
+.folio :where(.folio-scatter__dot, .folio-hist__bin) {
+	--folio-c: var(--folio-series-1);
+}
+
+/* Bars below zero: each bar sits on a track from a zero line; values outside the bar ends. */
+.folio .folio-bars__bar--div {
+	display: block;
+}
+
+.folio .folio-bars__track {
+	position: relative;
+	display: block;
+	height: 1.15rem;
+	margin: 0 3.25rem;
+}
+
+.folio .folio-bars__zero {
+	position: absolute;
+	top: -0.2rem;
+	bottom: -0.2rem;
+	width: 1px;
+	background: var(--folio-border-strong);
+}
+
+.folio .folio-bars__bar--div .folio-bars__fill {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	min-width: 0;
+	border-radius: 0;
+}
+
+.folio .folio-bars__bar--div .folio-bars__val {
+	position: absolute;
+	top: 50%;
+	padding-left: 0.4rem;
+	transform: translateY(-50%);
+	font-size: 0.85rem;
+}
+
+.folio .folio-bars__bar--div .folio-bars__val.is-neg {
+	padding: 0 0.4rem 0 0;
+	transform: translate(-100%, -50%);
+}
+
+/* Grouped columns: a group per label, columns side by side. */
+.folio .folio-cols__group {
+	display: flex;
+	flex: 1 1 0;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 3px;
+	max-width: 5rem;
+	height: 100%;
+}
+
+.folio .folio-cols__group .folio-cols__col {
+	flex: 1 1 0;
+}
+
+.folio .folio-cols__group .folio-cols__col span {
+	font-size: 0.7rem;
+}
+
+/* Scatter */
+.folio .folio-scatter__dot {
+	position: absolute;
+	width: 0.7rem;
+	height: 0.7rem;
+	border: 1.5px solid var(--folio-surface);
+	border-radius: 50%;
+	background: var(--folio-c);
+	opacity: 0.85;
+	transform: translate(-50%, -50%);
+}
+
+/* Histogram: touching columns between bin edges */
+.folio .folio-hist {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: 14rem auto auto;
+	column-gap: 0.6rem;
+}
+
+.folio .folio-hist__plot {
+	position: relative;
+	display: flex;
+	align-items: flex-end;
+	border-bottom: 1px solid var(--folio-border-strong);
+}
+
+.folio .folio-hist__bin {
+	position: relative;
+	flex: 1 1 0;
+	height: var(--folio-to);
+	background: var(--folio-c);
+	box-shadow: inset -1px 0 0 var(--folio-surface);
+}
+
+.folio .folio-hist__bin span {
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	padding-bottom: 0.15rem;
+	transform: translateX(-50%);
+	font-size: 0.75rem;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.folio .folio-hist .folio-line__x {
+	grid-column: 2;
+}
+
+.folio .folio-hist__note {
+	grid-column: 2;
+	margin: 0.2rem 0 0;
+	color: var(--folio-text-muted);
+	font-size: 0.78rem;
+	text-align: center;
+}
+
+/* Heatmap: a table of shaded cells; scrolls inside its own box if wider than a phone. */
+.folio .folio-heat {
+	overflow-x: auto;
+}
+
+.folio .folio-heat table {
+	width: 100%;
+	margin: 0;
+	border-collapse: separate;
+	border-spacing: 3px;
+	font-size: 0.85rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.folio .folio-heat th {
+	padding: 0.25rem 0.4rem;
+	color: var(--folio-text-2);
+	font-weight: 600;
+	text-align: left;
+	white-space: nowrap;
+}
+
+.folio .folio-heat thead th {
+	color: var(--folio-text-muted);
+	font-size: 0.78rem;
+	text-align: center;
+}
+
+.folio .folio-heat td {
+	min-width: 2.6rem;
+	padding: 0.5rem 0.3rem;
+	border-radius: 4px;
+	background: color-mix(in srgb, var(--folio-accent) calc(8% + var(--folio-level, 0) * 82%), var(--folio-surface));
+	text-align: center;
+}
+
+.folio .folio-heat thead td {
+	background: none;
+}
+
+.folio .folio-heat td.is-dark {
+	color: var(--folio-on-accent);
+}
+
+.folio .folio-heat td.is-empty {
+	background: var(--folio-fill);
+}
+
+.folio .folio-heat__scale {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0.6rem 0 0;
+	color: var(--folio-text-muted);
+	font-size: 0.78rem;
+}
+
+.folio .folio-heat__ramp {
+	width: 6rem;
+	height: 0.5rem;
+	border-radius: var(--folio-radius-pill);
+	background: linear-gradient(to right, color-mix(in srgb, var(--folio-accent) 8%, var(--folio-surface)), var(--folio-accent));
+}
+
+/* Funnel: centred bars, narrowing stage by stage */
+.folio .folio-funnel {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.folio .folio-funnel__row {
+	display: grid;
+	grid-template-columns: minmax(6rem, 25%) 1fr minmax(6rem, 22%);
+	align-items: center;
+	gap: 0.85rem;
+	font-size: 0.9rem;
+}
+
+.folio .folio-funnel__label {
+	color: var(--folio-text-2);
+}
+
+.folio .folio-funnel__track {
+	display: flex;
+	justify-content: center;
+}
+
+.folio .folio-funnel__bar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--folio-to);
+	min-width: 3.5rem;
+	height: 2rem;
+	border-radius: 4px;
+	background: var(--folio-accent);
+	color: var(--folio-on-accent);
+	font-size: 0.85rem;
+}
+
+.folio .folio-funnel__row + .folio-funnel__row .folio-funnel__bar {
+	background: color-mix(in srgb, var(--folio-accent) 80%, var(--folio-dark));
+}
+
+.folio .folio-funnel__pct {
+	color: var(--folio-text-muted);
+	font-size: 0.8rem;
+	line-height: 1.3;
+}
+
+/* Waterfall: columns floating from the running total */
+.folio .folio-wf__plot {
+	align-items: stretch;
+}
+
+.folio .folio-wf__slot {
+	position: relative;
+	flex: 1 1 0;
+	max-width: 3.5rem;
+}
+
+.folio .folio-wf__bar {
+	position: absolute;
+	right: 0;
+	left: 0;
+	min-height: 2px;
+	border-radius: 3px;
+	background: var(--folio-live);
+}
+
+.folio .folio-wf__bar.is-down {
+	background: var(--folio-warn);
+}
+
+.folio .folio-wf__bar.is-total {
+	background: var(--folio-dark);
+}
+
+.folio .folio-wf__bar span {
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	padding-bottom: 0.15rem;
+	transform: translateX(-50%);
+	font-size: 0.75rem;
+	font-weight: 600;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+.folio .folio-cols__grid.is-zero {
+	background: var(--folio-border-strong);
+}
+
+/* Bars plus a line: a second axis on the right */
+.folio .folio-combo {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: 14rem auto;
+	column-gap: 0.6rem;
+}
+
+.folio .folio-combo .folio-cols__x {
+	grid-column: 2;
+}
+
+.folio .folio-combo__plot .folio-cols__col {
+	--folio-c: var(--folio-series-1);
+	opacity: 0.9;
+}
+
+.folio .folio-combo__svg {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+	pointer-events: none;
+}
+
+.folio .folio-combo__y2 {
+	position: relative;
+	min-width: 2rem;
+}
+
+.folio .folio-combo__y2 span {
+	position: absolute;
+	left: 0;
+	transform: translateY(-50%);
+	color: var(--folio-series-2);
+	font-size: 0.78rem;
+	font-weight: 600;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+	.folio .folio-combo {
+		grid-template-rows: 11rem auto;
+	}
+
+	.folio .folio-hist {
+		grid-template-rows: 11rem auto auto;
+	}
+
+	.folio .folio-hist .folio-line__x span.is-minor {
+		display: none;
+	}
+
+	.folio .folio-funnel__row {
+		grid-template-columns: 1fr auto;
+		gap: 0.25rem 0.75rem;
+	}
+
+	.folio .folio-funnel__track {
+		grid-column: 1 / -1;
+		grid-row: 2;
+	}
+
+	.folio .folio-bars__track {
+		margin: 0 2.75rem;
+	}
+
+	.folio .folio-cols__x span {
+		font-size: 0.72rem;
+	}
+}
+
+/* Headroom for the value labels above the tallest column, so they never touch the title. */
+.folio .folio-cols,
+.folio .folio-hist,
+.folio .folio-combo {
+	margin-top: 1.25rem;
+}

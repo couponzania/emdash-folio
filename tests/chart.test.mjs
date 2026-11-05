@@ -167,8 +167,23 @@ test("barModel: a series column groups bars per category, with a legend in first
 	);
 });
 
-test("barModel: refuses negative values and more than four series", () => {
-	assert.equal(barModel(chartSpec(node({ data: "A,B\nx,-1", x: "a", y: "b" }))).reason, "Bars here start at zero; for values below zero use a line chart.");
+test("barModel: values below zero diverge from a zero line; all positive keeps the old layout", () => {
+	const m = barModel(chartSpec(node({ data: "Store,Change\nA,30\nB,-10\nC,0", x: "store", y: "change" })));
+	assert.equal(m.zero, 25, "range -10 to 30: zero a quarter of the way in");
+	assert.deepEqual(
+		m.rows.map((r) => [r.bars[0].left, r.bars[0].width, r.bars[0].text]),
+		[
+			[25, 75, "30"],
+			[0, 25, "-10"],
+			[25, 0, "0"],
+		],
+	);
+	const plain = barModel(chartSpec(node({ data: "A,B\nx,2\ny,1", x: "a", y: "b" })));
+	assert.equal("zero" in plain, false);
+	assert.equal("left" in plain.rows[0].bars[0], false, "positive bars render exactly as before");
+});
+
+test("barModel: refuses more than four series", () => {
 	const five = "A,S,B\n" + ["a", "b", "c", "d", "e"].map((s) => `x,${s},1`).join("\n");
 	assert.equal(barModel(chartSpec(node({ data: five, x: "a", y: "b", series: "s" }))).reason, "Too many series for bars: 5 (at most 4).");
 });

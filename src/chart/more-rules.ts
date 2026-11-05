@@ -8,13 +8,13 @@ export const MAX_COLUMNS = 12;
 export const MAX_STACK_SERIES = 6;
 export const MAX_AREA_SERIES = 4;
 
-type Tick = { value: number; label: string; percent: number };
+export type Tick = { value: number; label: string; percent: number };
 
-const seriesNames = (spec: ChartSpec) => (spec.series ? [...new Set(spec.rows.map((r) => String(r[spec.series as string])))] : []);
-const isWordUnit = (unit: string) => unit !== "" && unit !== "%" && !CURRENCY.has(unit);
+export const seriesNames = (spec: ChartSpec) => (spec.series ? [...new Set(spec.rows.map((r) => String(r[spec.series as string])))] : []);
+export const isWordUnit = (unit: string) => unit !== "" && unit !== "%" && !CURRENCY.has(unit);
 
 /** Ticks from zero up, positioned from the top (0% is the highest tick). */
-function zeroTicks(max: number, unit: string): { ticks: Tick[]; hi: number } {
+export function zeroTicks(max: number, unit: string): { ticks: Tick[]; hi: number } {
 	const values = niceTicks(0, max > 0 ? max : 1);
 	const hi = values[values.length - 1];
 	const label = isWordUnit(unit) ? "" : unit;
@@ -26,20 +26,44 @@ export interface ColumnModel {
 	unitNote: string;
 	yTicks: Tick[];
 	columns: Array<{ label: string; value: number; percent: number; text: string }>;
+	/** With a series column: one group per label, a column per series side by side. */
+	legend: LegendItem[];
+	groups: Array<{ label: string; bars: Array<{ series: string; slot: number; percent: number; text: string }> }>;
 }
 
-/** Vertical columns: one per row in the author's order, heights from zero. One series only. */
+export const MAX_COLUMN_SERIES = 4;
+
+/**
+ * Vertical columns from zero, in the author's order. One series gives one column per row; a
+ * series column groups them (up to 4 side by side per label).
+ */
 export function columnModel(spec: ChartSpec): ColumnModel | ChartError {
-	if (spec.series) return fail("Columns show one series; for groups use bars or stacked bars.");
-	if (spec.rows.length > MAX_COLUMNS) return fail(`Too many columns: ${spec.rows.length} (at most ${MAX_COLUMNS}); use a line chart.`);
 	const values = spec.rows.map((r) => Number(r[spec.y]));
 	if (values.some((v) => v < 0)) return fail("Columns start at zero; for values below zero use a line chart.");
+	const names = seriesNames(spec);
+	if (names.length > MAX_COLUMN_SERIES) return fail(`Too many series for columns: ${names.length} (at most ${MAX_COLUMN_SERIES}).`);
+	const labels = [...new Set(spec.rows.map((r) => String(r[spec.x])))];
+	const count = spec.series ? labels.length : spec.rows.length;
+	if (count > MAX_COLUMNS) return fail(`Too many columns: ${count} (at most ${MAX_COLUMNS}); use a line chart.`);
 	const { ticks, hi } = zeroTicks(Math.max(...values), spec.yUnit);
+	const pct = (v: number) => round((v / hi) * 100);
 	return {
 		ok: true,
 		unitNote: isWordUnit(spec.yUnit) ? spec.yUnit : "",
 		yTicks: ticks,
-		columns: spec.rows.map((r, i) => ({ label: String(r[spec.x]), value: values[i], percent: round((values[i] / hi) * 100), text: formatValue(values[i], spec.yUnit) })),
+		columns: spec.series ? [] : spec.rows.map((r, i) => ({ label: String(r[spec.x]), value: values[i], percent: pct(values[i]), text: formatValue(values[i], spec.yUnit) })),
+		legend: names.map((name, i) => ({ name, slot: i + 1 })),
+		groups: spec.series
+			? labels.map((label) => ({
+					label,
+					bars: names.flatMap((name, j) => {
+						const hit = spec.rows.find((r) => String(r[spec.x]) === label && String(r[spec.series as string]) === name);
+						if (!hit) return [];
+						const v = Number(hit[spec.y]);
+						return [{ series: name, slot: j + 1, percent: pct(v), text: formatValue(v, spec.yUnit) }];
+					}),
+				}))
+			: [],
 	};
 }
 

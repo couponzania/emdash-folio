@@ -1,0 +1,200 @@
+---
+// The chart kinds added in 0.7, drawn on the server: scatter (dots over a two-axis grid),
+// histogram (touching columns over bin edges), heatmap (a shaded table), funnel (centred bars),
+// waterfall (floating columns) and bars plus a line (columns with an SVG line on its own axis).
+// Chart.astro wraps them with the title, legend, data table and source.
+import "../styles/charts-extra.css";
+import type { comboModel, funnelModel, heatmapModel, histogramModel, scatterModel, waterfallModel } from "./extra-rules.ts";
+
+type Ok<F extends (...a: never[]) => unknown> = Extract<ReturnType<F>, { ok: true }>;
+
+interface Props {
+	alt: string;
+	scatter: Ok<typeof scatterModel> | null;
+	histogram: Ok<typeof histogramModel> | null;
+	heatmap: Ok<typeof heatmapModel> | null;
+	funnel: Ok<typeof funnelModel> | null;
+	waterfall: Ok<typeof waterfallModel> | null;
+	combo: Ok<typeof comboModel> | null;
+	yName: string;
+}
+
+const { alt, scatter, histogram, heatmap, funnel, waterfall, combo, yName } = Astro.props;
+---
+
+{
+	scatter && (
+		<div class="folio-line folio-scatter" role="img" aria-label={alt}>
+			<div class="folio-line__y" aria-hidden="true">
+				{scatter.yTicks.map((t) => (
+					<span style={`top:${t.percent}%`}>{t.label}</span>
+				))}
+			</div>
+			<div class="folio-line__plot" aria-hidden="true">
+				<svg viewBox="0 0 1000 1000" preserveAspectRatio="none" focusable="false">
+					{scatter.yTicks.map((t) => (
+						<line class="folio-line__grid" x1="0" x2="1000" y1={t.percent * 10} y2={t.percent * 10} vector-effect="non-scaling-stroke" />
+					))}
+					{scatter.xTicks.map((t) => (
+						<line class="folio-line__grid" y1="0" y2="1000" x1={t.percent * 10} x2={t.percent * 10} vector-effect="non-scaling-stroke" />
+					))}
+				</svg>
+				{scatter.points.map((p) => (
+					<span class="folio-scatter__dot" data-slot={p.slot} style={`left:${p.left}%;top:${p.top}%`} title={p.text} />
+				))}
+			</div>
+			<div class="folio-line__x" aria-hidden="true">
+				{scatter.xTicks.map((t) => (
+					<span class:list={[t.minor && "is-minor"]} style={`left:${t.percent}%`}>{t.label}</span>
+				))}
+			</div>
+		</div>
+	)
+}
+
+{
+	histogram && (
+		<div class="folio-hist" role="img" aria-label={alt}>
+			<div class="folio-line__y" aria-hidden="true">
+				{histogram.yTicks.map((t) => (
+					<span style={`top:${t.percent}%`}>{t.label}</span>
+				))}
+			</div>
+			<div class="folio-hist__plot" aria-hidden="true">
+				{histogram.yTicks.map((t) => (
+					<span class="folio-cols__grid" style={`top:${t.percent}%`} />
+				))}
+				{histogram.bins.map((b) => (
+					<div class="folio-hist__bin" style={`--folio-to:${b.percent}%`} title={`${b.from} to ${b.to}: ${b.text}`}>
+						{b.count > 0 && <span>{b.text}</span>}
+					</div>
+				))}
+			</div>
+			<div class="folio-line__x" aria-hidden="true">
+				{histogram.edges.map((e) => (
+					<span class:list={[e.minor && "is-minor"]} style={`left:${e.percent}%`}>{e.label}</span>
+				))}
+			</div>
+			<p class="folio-hist__note" aria-hidden="true">
+				{`Count of ${yName} in each range`}
+			</p>
+		</div>
+	)
+}
+
+{
+	heatmap && (
+		<div class="folio-heat">
+			<table aria-label={alt}>
+				<thead>
+					<tr>
+						<td />
+						{heatmap.columns.map((c) => (
+							<th scope="col">{c}</th>
+						))}
+					</tr>
+				</thead>
+				<tbody>
+					{heatmap.rows.map((r) => (
+						<tr>
+							<th scope="row">{r.label}</th>
+							{r.cells.map((c) => (
+								<td class:list={[c.value === null && "is-empty", c.level > 0.6 && "is-dark"]} style={c.value === null ? undefined : `--folio-level:${c.level}`}>
+									{c.text}
+								</td>
+							))}
+						</tr>
+					))}
+				</tbody>
+			</table>
+			<p class="folio-heat__scale" aria-hidden="true">
+				<span>{heatmap.min}</span>
+				<span class="folio-heat__ramp" />
+				<span>{heatmap.max}</span>
+			</p>
+		</div>
+	)
+}
+
+{
+	funnel && (
+		<div class="folio-funnel" role="img" aria-label={alt}>
+			{funnel.stages.map((s) => (
+				<div class="folio-funnel__row" aria-hidden="true">
+					<span class="folio-funnel__label">{s.label}</span>
+					<span class="folio-funnel__track">
+						<span class="folio-funnel__bar" style={`--folio-to:${s.width}%`}>
+							<b>{s.text}</b>
+						</span>
+					</span>
+					<span class="folio-funnel__pct">{s.ofPrevious && `${s.ofPrevious} of the stage before`}</span>
+				</div>
+			))}
+		</div>
+	)
+}
+
+{
+	waterfall && (
+		<div class="folio-cols folio-wf" role="img" aria-label={alt}>
+			<div class="folio-line__y" aria-hidden="true">
+				{waterfall.yTicks.map((t) => (
+					<span style={`top:${t.percent}%`}>{t.label}</span>
+				))}
+			</div>
+			<div class="folio-cols__plot folio-wf__plot" aria-hidden="true">
+				{waterfall.yTicks.map((t) => (
+					<span class:list={["folio-cols__grid", t.value === 0 && "is-zero"]} style={`top:${t.percent}%`} />
+				))}
+				{waterfall.steps.map((s) => (
+					<div class="folio-wf__slot">
+						<div class:list={["folio-wf__bar", `is-${s.kind}`]} style={`bottom:${s.bottom}%;height:${s.height}%`} title={`${s.label}: ${s.text}`}>
+							<span>{s.text}</span>
+						</div>
+					</div>
+				))}
+			</div>
+			<div class="folio-cols__x" aria-hidden="true">
+				{waterfall.steps.map((s) => (
+					<span>{s.label}</span>
+				))}
+			</div>
+		</div>
+	)
+}
+
+{
+	combo && (
+		<div class="folio-combo" role="img" aria-label={alt}>
+			<div class="folio-line__y" aria-hidden="true">
+				{combo.yTicks.map((t) => (
+					<span style={`top:${t.percent}%`}>{t.label}</span>
+				))}
+			</div>
+			<div class="folio-cols__plot folio-combo__plot" aria-hidden="true">
+				{combo.yTicks.map((t) => (
+					<span class="folio-cols__grid" style={`top:${t.percent}%`} />
+				))}
+				{combo.groups.map((g) => (
+					<div class="folio-cols__col" style={`--folio-to:${g.bar.percent}%`} title={`${g.label}: ${g.bar.text}`} />
+				))}
+				<svg class="folio-combo__svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" focusable="false">
+					<polyline class="folio-line__path" data-slot="2" points={combo.line} vector-effect="non-scaling-stroke" />
+				</svg>
+				{combo.groups.map((g) => (
+					<span class="folio-line__dot" data-slot="2" style={`left:${g.point.left}%;top:${g.point.top}%`} title={`${g.label}: ${g.point.text}`} />
+				))}
+			</div>
+			<div class="folio-combo__y2" aria-hidden="true">
+				{combo.y2Ticks.map((t) => (
+					<span style={`top:${t.percent}%`}>{t.label}</span>
+				))}
+			</div>
+			<div class="folio-cols__x" aria-hidden="true">
+				{combo.groups.map((g) => (
+					<span>{g.label}</span>
+				))}
+			</div>
+		</div>
+	)
+}

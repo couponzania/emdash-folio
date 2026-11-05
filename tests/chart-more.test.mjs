@@ -42,8 +42,38 @@ test("columnModel: heights from zero on nice ticks, values as text", () => {
 	assert.equal(word.columns[0].text, "5 million");
 });
 
-test("columnModel: refuses series, negatives and too many columns", () => {
-	assert.match(columnModel(spec({ kind: "column", data: "a,s,v\nx,p,1", x: "a", y: "v", series: "s" })).reason, /one series/);
+test("columnModel: a series column groups columns side by side, in legend order", () => {
+	const m = columnModel(spec({ kind: "column", data: "Year,Store,Orders\n2024,A,40\n2024,B,20\n2025,A,50\n2025,B,30", x: "year", y: "orders", series: "store" }));
+	assert.equal(m.ok, true);
+	assert.deepEqual(m.columns, []);
+	assert.deepEqual(
+		m.legend.map((l) => l.name),
+		["A", "B"],
+	);
+	assert.deepEqual(
+		m.groups.map((g) => [g.label, g.bars.map((b) => [b.slot, b.percent])]),
+		[
+			[
+				"2024",
+				[
+					[1, 80],
+					[2, 40],
+				],
+			],
+			[
+				"2025",
+				[
+					[1, 100],
+					[2, 60],
+				],
+			],
+		],
+	);
+	const five = "a,s,v\n" + "pqrst".split("").map((s) => `x,${s},1`).join("\n");
+	assert.match(columnModel(spec({ kind: "column", data: five, x: "a", y: "v", series: "s" })).reason, /at most 4/);
+});
+
+test("columnModel: refuses negatives and too many columns", () => {
 	assert.match(columnModel(spec({ kind: "column", data: "a,v\nx,-1", x: "a", y: "v" })).reason, /zero/);
 	const many = ["a,v", ...Array.from({ length: MAX_COLUMNS + 1 }, (_, i) => `r${i},1`)].join("\n");
 	assert.match(columnModel(spec({ kind: "column", data: many, x: "a", y: "v" })).reason, /13/);

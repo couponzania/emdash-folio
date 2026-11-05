@@ -2,6 +2,15 @@
 
 Every change to Folio gets an entry and a version bump (semver), released as a `v{version}` tag. The version lives in `package.json` and `FOLIO_VERSION` in `src/plugin.js`; a test fails if they or this file disagree.
 
+## 0.7.0 (2026-11-05)
+
+- Six more chart types in the chart block, drawn by Folio's own code: **Scatter** (`scatter`), **Histogram** (`histogram`), **Heatmap** (`heatmap`), **Funnel** (`funnel`), **Waterfall** (`waterfall`) and **Bars plus a line** (`combo`, the line on its own right axis). Each says why when the data doesn't fit.
+- **Bars below zero**: bar charts with a negative value now diverge from a zero line instead of being refused. All-positive bar charts render exactly as before.
+- **Grouped columns**: columns take a series column (up to 4 side by side per label).
+- New fields: the line's column and unit (bars plus a line), the unit along the bottom (scatter), the number of ranges (histogram) and the final bar's label (waterfall).
+- Column, histogram and combo plots get headroom so value labels never touch the title.
+- Rules in `src/chart/extra-rules.ts`, rendering in `src/chart/ExtraCharts.astro`, styles in `src/styles/charts-extra.css`, all tested.
+
 ## 0.6.0 (2026-11-05)
 
 - Four new chart types in the chart block, drawn by Folio's own code like the others: **Columns** (`column`: vertical, one series, up to 12), **Stacked bars** (`stacked`: needs a series column, up to 6 parts; "Totals" keeps bar lengths, "Shares" draws every bar as 100%), **Area** (`area`: one area from zero, or up to 4 stacked by a series column; no gaps) and **Comparison** (`compare`: exactly two series, e.g. 2025 and 2026, as two dots per row on one scale, sorted by the change; the earlier value is grey). Each says why when the data doesn't fit.

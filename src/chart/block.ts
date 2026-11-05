@@ -7,7 +7,7 @@ export const CHART_TYPE = "folioChart";
 export const chartBlock: PortableTextBlockConfig = {
 	type: CHART_TYPE,
 	label: "Chart",
-	description: "A bar, line, donut, column, stacked, area or comparison chart from pasted data, drawn on the server with its data table",
+	description: "Thirteen chart types from pasted data, drawn on the server with a data table",
 	category: "Folio",
 	fields: [
 		{
@@ -22,6 +22,12 @@ export const chartBlock: PortableTextBlockConfig = {
 				{ label: "Stacked bars: parts of a whole across groups (needs a series column)", value: "stacked" },
 				{ label: "Area: a total over time (a series column stacks up to 4)", value: "area" },
 				{ label: "Comparison: before and after per row (a series column with exactly 2 values)", value: "compare" },
+				{ label: "Scatter: two measures against each other (numbers in both columns)", value: "scatter" },
+				{ label: "Histogram: how one column's values are spread (no label column)", value: "histogram" },
+				{ label: "Heatmap: a grid shaded by value (columns across, series down)", value: "heatmap" },
+				{ label: "Funnel: how many make it through each stage (up to 8)", value: "funnel" },
+				{ label: "Waterfall: changes adding up to a total (up to 12)", value: "waterfall" },
+				{ label: "Bars plus a line: two measures with different units", value: "combo" },
 			],
 		},
 		{ type: "text_input", action_id: "title", label: "Title", placeholder: "Amazon Prime members worldwide, 2020 to 2025" },
@@ -52,6 +58,11 @@ export const chartBlock: PortableTextBlockConfig = {
 			],
 		},
 		{ type: "text_input", action_id: "yUnit", label: "Unit (optional)", placeholder: "%, $, ₹, million" },
+		{ type: "text_input", action_id: "y2", label: "Column for the line (bars plus a line only)", placeholder: "Conversion rate" },
+		{ type: "text_input", action_id: "y2Unit", label: "The line's unit (optional)", placeholder: "%" },
+		{ type: "text_input", action_id: "xUnit", label: "Unit along the bottom (scatter only, optional)", placeholder: "$" },
+		{ type: "text_input", action_id: "bins", label: "Number of ranges (histogram only, optional, 2 to 30)", placeholder: "8" },
+		{ type: "text_input", action_id: "totalLabel", label: "Label of the final bar (waterfall only, optional)", placeholder: "Total" },
 		{ type: "text_input", action_id: "caption", label: "Note under the chart (optional)", multiline: true, placeholder: "Figures for each calendar year; 2025 is an estimate." },
 		{ type: "text_input", action_id: "sourceName", label: "Source", placeholder: "Amazon annual report 2025" },
 		{ type: "text_input", action_id: "sourceLink", label: "Source link (optional)", placeholder: "https://…" },

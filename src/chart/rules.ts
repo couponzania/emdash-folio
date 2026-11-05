@@ -4,7 +4,7 @@
 import { safeHref, text } from "../shared/fields.ts";
 import { parseGrid } from "../shared/grid.ts";
 
-export const CHART_KINDS = ["bar", "line", "donut", "column", "stacked", "area", "compare"] as const;
+export const CHART_KINDS = ["bar", "line", "donut", "column", "stacked", "area", "compare", "scatter", "histogram", "heatmap", "funnel", "waterfall", "combo"] as const;
 export type ChartKind = (typeof CHART_KINDS)[number];
 
 export const MAX_ROWS = 500;
@@ -30,6 +30,15 @@ export interface ChartSpec {
 	yUnit: string;
 	/** Stacked bars only: "share" draws every bar as 100%; otherwise bars keep their totals. */
 	stackMode: "total" | "share";
+	/** Bars plus a line: the line's column and unit. */
+	y2?: string;
+	y2Unit: string;
+	/** Scatter: the unit of the x values. */
+	xUnit: string;
+	/** Histogram: how many bins (2 to 30), or null to choose. */
+	bins: number | null;
+	/** Waterfall: the label of the closing total bar. */
+	totalLabel: string;
 }
 
 export interface ChartError {
@@ -53,6 +62,8 @@ export function toNumber(input: string): number | null {
 
 export const fail = (reason: string): ChartError => ({ ok: false, reason });
 
+const NUMBER_RE = /^-?\d+(\.\d+)?$/;
+
 /** Reads and checks the block's fields. Never throws: a problem comes back as a reason. */
 export function chartSpec(node: Record<string, unknown>): ChartSpec | ChartError {
 	const kind = text(node.kind) || "bar";
@@ -68,32 +79,51 @@ export function chartSpec(node: Record<string, unknown>): ChartSpec | ChartError
 	const xName = text(node.x);
 	const yName = text(node.y);
 	const seriesName = text(node.series);
-	if (xName === "") return fail("Name the column along the x axis.");
+	const y2Name = text(node.y2);
+	// A histogram counts one column of values; it has no label column.
+	const needsX = kind !== "histogram";
+	if (needsX && xName === "") return fail("Name the column along the x axis.");
 	if (yName === "") return fail("Name the column of values.");
-	const x = column(xName);
-	if (!x) return fail(`No column named "${xName}" in the data.`);
 	const y = column(yName);
 	if (!y) return fail(`No column named "${yName}" in the data.`);
+	const x = xName ? column(xName) : y;
+	if (!x) return fail(`No column named "${xName}" in the data.`);
 	const series = seriesName ? column(seriesName) : undefined;
 	if (seriesName && !series) return fail(`No column named "${seriesName}" in the data.`);
+	let y2: string | undefined;
+	if (kind === "combo") {
+		if (y2Name === "") return fail("Bars plus a line need the line's column too.");
+		y2 = column(y2Name);
+		if (!y2) return fail(`No column named "${y2Name}" in the data.`);
+	}
 
 	const overTime = kind === "line";
-	const numericX = (overTime || kind === "area") && table.rows.every((r) => /^-?\d+(\.\d+)?$/.test(r[x]));
+	const allNumericX = table.rows.every((r) => NUMBER_RE.test(r[x]));
+	if (kind === "scatter" && !table.rows.every((r) => toNumber(r[x]) !== null)) return fail(`A scatter needs numbers in ${x}.`);
+	const numericX = (overTime || kind === "area") && allNumericX;
 	const rows: ChartRow[] = [];
 	for (const [i, r] of table.rows.entries()) {
 		const raw = r[y];
 		let value: number | null = null;
 		if (raw === "") {
-			if (!overTime) return fail(`Row ${i + 1}: ${y} is empty.`);
+			if (!overTime && kind !== "heatmap") return fail(`Row ${i + 1}: ${y} is empty.`);
 		} else {
 			value = toNumber(raw);
 			if (value === null) return fail(`Row ${i + 1}: "${raw}" in ${y} is not a number.`);
 		}
-		rows.push({ [x]: numericX ? Number(r[x]) : r[x], ...(series ? { [series]: r[series] } : {}), [y]: value });
+		const xValue: Cell = kind === "scatter" ? toNumber(r[x]) : numericX ? Number(r[x]) : r[x];
+		const row: ChartRow = { [x]: xValue, ...(series ? { [series]: r[series] } : {}), [y]: value };
+		if (y2) {
+			const v2 = toNumber(r[y2]);
+			if (v2 === null) return fail(`Row ${i + 1}: "${r[y2]}" in ${y2} is not a number.`);
+			row[y2] = v2;
+		}
+		rows.push(row);
 	}
 
 	const sourceName = text(node.sourceName);
 	const sourceHref = safeHref(node.sourceLink);
+	const binsRaw = /^\d+$/.test(text(node.bins)) ? Number(text(node.bins)) : null;
 	return {
 		ok: true,
 		kind: kind as ChartKind,
@@ -101,11 +131,16 @@ export function chartSpec(node: Record<string, unknown>): ChartSpec | ChartError
 		x,
 		y,
 		...(series ? { series } : {}),
+		...(y2 ? { y2 } : {}),
 		title: text(node.title),
 		alt,
 		caption: text(node.caption),
 		...(sourceName ? { source: { name: sourceName, ...(sourceHref ? { href: sourceHref } : {}) } } : {}),
 		yUnit: text(node.yUnit),
+		y2Unit: text(node.y2Unit),
+		xUnit: text(node.xUnit),
+		bins: binsRaw !== null && binsRaw >= 2 && binsRaw <= 30 ? binsRaw : null,
+		totalLabel: text(node.totalLabel) || "Total",
 		stackMode: text(node.stackMode) === "share" ? "share" : "total",
 	};
 }
@@ -213,12 +248,23 @@ export interface LegendItem {
 export interface BarModel {
 	ok: true;
 	legend: LegendItem[];
-	rows: Array<{ label: string; bars: Array<{ series: string; slot: number; value: number; percent: number; text: string }> }>;
+	rows: Array<{ label: string; bars: Array<{ series: string; slot: number; value: number; percent: number; text: string; left?: number; width?: number }> }>;
+	/** Only when a value is below zero: where zero sits, in percent of the track. */
+	zero?: number;
 }
 
-/** Horizontal bars: one row per category in the author's order, a bar per series inside it. */
+/**
+ * Horizontal bars: one row per category in the author's order, a bar per series inside it. With
+ * any value below zero the bars diverge from a zero line instead: each bar gets `left` and
+ * `width` in percent of the track, and `zero` marks the line.
+ */
 export function barModel(spec: ChartSpec): BarModel | ChartError {
-	if (spec.rows.some((r) => Number(r[spec.y]) < 0)) return fail("Bars here start at zero; for values below zero use a line chart.");
+	const all = spec.rows.map((r) => Number(r[spec.y]));
+	const diverging = all.some((v) => v < 0);
+	const lowest = Math.min(0, ...all);
+	const range = Math.max(0, ...all) - lowest;
+	const zero = diverging ? round((-lowest / range) * 100) : 0;
+	const span = (v: number) => (diverging ? { left: round(v < 0 ? zero - (-v / range) * 100 : zero), width: round((Math.abs(v) / range) * 100) } : {});
 	const names = spec.series ? [...new Set(spec.rows.map((r) => String(r[spec.series as string])))] : [];
 	if (names.length > MAX_BAR_SERIES) return fail(`Too many series for bars: ${names.length} (at most ${MAX_BAR_SERIES}).`);
 	const slot = (name: string) => (spec.series ? names.indexOf(name) + 1 : 1);
@@ -233,9 +279,9 @@ export function barModel(spec: ChartSpec): BarModel | ChartError {
 			row = { label, bars: [] };
 			rows.push(row);
 		}
-		row.bars.push({ series, slot: slot(series), value, percent: max > 0 ? round((value / max) * 100) : 0, text: formatValue(value, spec.yUnit) });
+		row.bars.push({ series, slot: slot(series), value, percent: max > 0 ? round((Math.max(0, value) / max) * 100) : 0, text: formatValue(value, spec.yUnit), ...span(value) });
 	}
-	return { ok: true, legend: names.map((name, i) => ({ name, slot: i + 1 })), rows };
+	return { ok: true, legend: names.map((name, i) => ({ name, slot: i + 1 })), rows, ...(diverging ? { zero } : {}) };
 }
 
 /** The gap, in percent of the plot's width, a phone needs between two x labels. */

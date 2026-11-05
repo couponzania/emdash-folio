@@ -103,13 +103,18 @@ Review markup: `itemReviewed` (type and name), `reviewRating` (the overall score
 
 ### Chart (`folioChart`)
 
-Bar, line, donut, column, stacked bar, area and comparison charts from pasted data, drawn on the server by Folio itself (no chart library). Every chart carries its description for screen readers, a data table behind a "Data table" toggle, an optional note and a linked source.
+Thirteen chart types from pasted data, drawn on the server by Folio itself (no chart library). Every chart carries its description for screen readers, a data table behind a "Data table" toggle, an optional note and a linked source.
 
 | Field | Notes |
 |---|---|
-| Chart | **Bars** to compare or rank amounts (horizontal, so labels stay readable on phones; values from zero up), **Line** for change over time, **Donut** for parts of one whole (up to 6 slices, no negatives). |
-| More charts | **Columns** for a few periods (one series, up to 12). **Stacked bars** for parts of a whole across groups (a series column, up to 6 parts; "Stacked bars show" picks totals or 100% shares). **Area** for a total over time (a series column stacks up to 4; every series needs a value at every point). **Comparison** for before and after per row (a series column with exactly two values; rows sorted by the change). |
+| Chart | **Bars** to compare or rank amounts (horizontal, so labels stay readable on phones; with any value below zero they diverge from a zero line), **Line** for change over time, **Donut** for parts of one whole (up to 6 slices, no negatives). |
+| More charts | **Columns** for a few periods (up to 12; a series column groups up to 4 side by side). **Stacked bars** for parts of a whole across groups (a series column, up to 6 parts; "Stacked bars show" picks totals or 100% shares). **Area** for a total over time (a series column stacks up to 4; every series needs a value at every point). **Comparison** for before and after per row (a series column with exactly two values; rows sorted by the change). |
+| Analysis charts | **Scatter** for two measures against each other (numbers in both columns; a series column colours the dots; at least 3 points). **Histogram** for how one column's values spread (no label column; equal round ranges, the bins field or an automatic count). **Heatmap** for a grid shaded by value (the x column across, the series column down; up to 12 by 20; empty cells blank). **Funnel** for stages people drop out of (up to 8, each with its share of the stage before). **Waterfall** for changes adding up to a total (each row is a change, the first usually the starting amount; a closing total bar; up to 12). **Bars plus a line** for two measures with different units (the value column as columns, the line column on its own right axis; up to 12). |
 | Stacked bars show | Totals (longer bars for bigger totals) or Shares (every bar 100%). Stacked bars only. |
+| Column for the line, its unit | Bars plus a line only. |
+| Unit along the bottom | Scatter only, e.g. `$` or `%`. |
+| Number of ranges | Histogram only, 2 to 30. Blank: chosen from the number of values. |
+| Label of the final bar | Waterfall only. Default "Total". |
 | Title | Shown above the chart. |
 | What it shows | Required. One sentence with the finding; screen readers read it as the chart. |
 | Data | CSV, tab separated (pasted from a spreadsheet) or semicolon separated. The first row names the columns. Values may carry thousands separators, a leading currency sign or a trailing %. Up to 500 rows. |

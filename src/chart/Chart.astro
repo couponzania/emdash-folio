@@ -5,6 +5,9 @@
 // screen readers, and its source. A chart that can't be drawn says why instead.
 import "../styles/folio.css";
 import "../styles/charts-more.css";
+import "../styles/charts-extra.css";
+import ExtraCharts from "./ExtraCharts.astro";
+import { comboModel, funnelModel, heatmapModel, histogramModel, scatterModel, waterfallModel } from "./extra-rules.ts";
 import { areaModel, columnModel, compareModel, stackModel } from "./more-rules.ts";
 import { barModel, chartSpec, donutModel, formatValue, lineModel } from "./rules.ts";
 import type { ChartSpec } from "./rules.ts";
@@ -14,7 +17,21 @@ interface Props {
 }
 
 const spec = chartSpec(Astro.props.node);
-const MODELS = { bar: barModel, line: lineModel, donut: donutModel, column: columnModel, stacked: stackModel, area: areaModel, compare: compareModel };
+const MODELS = {
+	bar: barModel,
+	line: lineModel,
+	donut: donutModel,
+	column: columnModel,
+	stacked: stackModel,
+	area: areaModel,
+	compare: compareModel,
+	scatter: scatterModel,
+	histogram: histogramModel,
+	heatmap: heatmapModel,
+	funnel: funnelModel,
+	waterfall: waterfallModel,
+	combo: comboModel,
+};
 const model = !spec.ok ? spec : (MODELS[spec.kind] as (s: ChartSpec) => ReturnType<(typeof MODELS)[keyof typeof MODELS]>)(spec);
 if (!model.ok) console.warn(`[folio] chart ${Astro.props.node._key} not drawn: ${model.reason}`);
 const bar = spec.ok && spec.kind === "bar" && model.ok ? (model as Extract<ReturnType<typeof barModel>, { ok: true }>) : null;
@@ -26,8 +43,14 @@ const cols = pick<typeof columnModel>("column");
 const stack = pick<typeof stackModel>("stacked");
 const area = pick<typeof areaModel>("area");
 const compare = pick<typeof compareModel>("compare");
-const legend = bar?.legend ?? line?.legend ?? stack?.legend ?? area?.legend ?? compare?.legend ?? [];
-const unitNote = line?.unitNote || area?.unitNote || cols?.unitNote || "";
+const scatter = pick<typeof scatterModel>("scatter");
+const histogram = pick<typeof histogramModel>("histogram");
+const heatmap = pick<typeof heatmapModel>("heatmap");
+const funnel = pick<typeof funnelModel>("funnel");
+const waterfall = pick<typeof waterfallModel>("waterfall");
+const combo = pick<typeof comboModel>("combo");
+const legend = bar?.legend ?? line?.legend ?? stack?.legend ?? area?.legend ?? compare?.legend ?? scatter?.legend ?? combo?.legend ?? cols?.legend ?? [];
+const unitNote = line?.unitNote || area?.unitNote || cols?.unitNote || scatter?.unitNote || waterfall?.unitNote || "";
 const unitHead = spec.ok && spec.yUnit ? `${spec.y} (${spec.yUnit})` : spec.ok ? spec.y : "";
 const hasFoot = spec.ok && (spec.caption || spec.source);
 ---
@@ -57,12 +80,24 @@ const hasFoot = spec.ok && (spec.caption || spec.source);
 							<div class="folio-bars__row" aria-hidden="true">
 								<span class="folio-bars__label">{row.label}</span>
 								<span class="folio-bars__set">
-									{row.bars.map((b) => (
-										<span class="folio-bars__bar">
-											<span class="folio-bars__fill" data-slot={b.slot} style={`--folio-to:${b.percent}%`} />
-											<span class="folio-bars__val">{b.text}</span>
-										</span>
-									))}
+									{row.bars.map((b) =>
+										bar.zero === undefined ? (
+											<span class="folio-bars__bar">
+												<span class="folio-bars__fill" data-slot={b.slot} style={`--folio-to:${b.percent}%`} />
+												<span class="folio-bars__val">{b.text}</span>
+											</span>
+										) : (
+											<span class="folio-bars__bar folio-bars__bar--div">
+												<span class="folio-bars__track">
+													<span class="folio-bars__zero" style={`left:${bar.zero}%`} />
+													<span class="folio-bars__fill" data-slot={b.slot} style={`left:${b.left}%;width:${b.width}%`} />
+													<span class:list={["folio-bars__val", b.value < 0 && "is-neg"]} style={`left:${b.value < 0 ? b.left : (b.left ?? 0) + (b.width ?? 0)}%`}>
+														{b.text}
+													</span>
+												</span>
+											</span>
+										),
+									)}
 								</span>
 							</div>
 						))}
@@ -143,9 +178,18 @@ const hasFoot = spec.ok && (spec.caption || spec.source);
 									<span>{c.text}</span>
 								</div>
 							))}
+							{cols.groups.map((g) => (
+								<div class="folio-cols__group">
+									{g.bars.map((b) => (
+										<div class="folio-cols__col" data-slot={b.slot} style={`--folio-to:${b.percent}%`} title={`${g.label}, ${b.series}: ${b.text}`}>
+											<span>{b.text}</span>
+										</div>
+									))}
+								</div>
+							))}
 						</div>
 						<div class="folio-cols__x" aria-hidden="true">
-							{cols.columns.map((c) => (
+							{(cols.groups.length ? cols.groups : cols.columns).map((c) => (
 								<span>{c.label}</span>
 							))}
 						</div>
@@ -214,29 +258,56 @@ const hasFoot = spec.ok && (spec.caption || spec.source);
 					</div>
 				)}
 
+				{spec.ok && (scatter || histogram || heatmap || funnel || waterfall || combo) && (
+					<ExtraCharts alt={spec.alt} scatter={scatter} histogram={histogram} heatmap={heatmap} funnel={funnel} waterfall={waterfall} combo={combo} yName={spec.y} />
+				)}
+
 				<details class="folio-chart__data">
 					<summary>Data table</summary>
 					<div class="folio-chart__scroll">
+						{histogram ? (
+							<table>
+								<thead>
+									<tr>
+										<th scope="col">{`${spec.y} from`}</th>
+										<th scope="col">to</th>
+										<th scope="col">Count</th>
+									</tr>
+								</thead>
+								<tbody>
+									{histogram.bins.map((b) => (
+										<tr>
+											<th scope="row">{formatValue(b.from, spec.yUnit)}</th>
+											<td>{formatValue(b.to, spec.yUnit)}</td>
+											<td>{b.count}</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						) : (
 						<table>
 							<thead>
 								<tr>
 									<th scope="col">{spec.x}</th>
 									{spec.series && <th scope="col">{spec.series}</th>}
 									<th scope="col">{unitHead}</th>
+									{spec.y2 && <th scope="col">{spec.y2Unit ? `${spec.y2} (${spec.y2Unit})` : spec.y2}</th>}
 									{donut && <th scope="col">Share</th>}
 								</tr>
 							</thead>
 							<tbody>
 								{spec.rows.map((r, i) => (
 									<tr>
-										<th scope="row">{String(r[spec.x] ?? "")}</th>
+										<th scope="row">{typeof r[spec.x] === "number" && spec.xUnit ? formatValue(r[spec.x] as number, spec.xUnit) : String(r[spec.x] ?? "")}</th>
 										{spec.series && <td>{String(r[spec.series] ?? "")}</td>}
 										<td>{typeof r[spec.y] === "number" ? formatValue(r[spec.y] as number, spec.yUnit) : "No data"}</td>
+										{spec.y2 && <td>{formatValue(r[spec.y2] as number, spec.y2Unit)}</td>}
 										{donut && <td>{donut.slices[i]?.percent}</td>}
 									</tr>
 								))}
 							</tbody>
 						</table>
+						)}
 					</div>
 				</details>
 
