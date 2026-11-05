@@ -4,19 +4,30 @@
 // donut as SVG arcs. Every chart carries its numbers as a data table, its description for
 // screen readers, and its source. A chart that can't be drawn says why instead.
 import "../styles/folio.css";
+import "../styles/charts-more.css";
+import { areaModel, columnModel, compareModel, stackModel } from "./more-rules.ts";
 import { barModel, chartSpec, donutModel, formatValue, lineModel } from "./rules.ts";
+import type { ChartSpec } from "./rules.ts";
 
 interface Props {
 	node: Record<string, unknown> & { _type: string; _key: string };
 }
 
 const spec = chartSpec(Astro.props.node);
-const model = !spec.ok ? spec : spec.kind === "bar" ? barModel(spec) : spec.kind === "line" ? lineModel(spec) : donutModel(spec);
+const MODELS = { bar: barModel, line: lineModel, donut: donutModel, column: columnModel, stacked: stackModel, area: areaModel, compare: compareModel };
+const model = !spec.ok ? spec : (MODELS[spec.kind] as (s: ChartSpec) => ReturnType<(typeof MODELS)[keyof typeof MODELS]>)(spec);
 if (!model.ok) console.warn(`[folio] chart ${Astro.props.node._key} not drawn: ${model.reason}`);
 const bar = spec.ok && spec.kind === "bar" && model.ok ? (model as Extract<ReturnType<typeof barModel>, { ok: true }>) : null;
 const line = spec.ok && spec.kind === "line" && model.ok ? (model as Extract<ReturnType<typeof lineModel>, { ok: true }>) : null;
 const donut = spec.ok && spec.kind === "donut" && model.ok ? (model as Extract<ReturnType<typeof donutModel>, { ok: true }>) : null;
-const legend = bar?.legend ?? line?.legend ?? [];
+type Ok<F extends (...a: never[]) => unknown> = Extract<ReturnType<F>, { ok: true }>;
+const pick = <F extends (...a: never[]) => unknown>(kind: string) => (spec.ok && spec.kind === kind && model.ok ? (model as Ok<F>) : null);
+const cols = pick<typeof columnModel>("column");
+const stack = pick<typeof stackModel>("stacked");
+const area = pick<typeof areaModel>("area");
+const compare = pick<typeof compareModel>("compare");
+const legend = bar?.legend ?? line?.legend ?? stack?.legend ?? area?.legend ?? compare?.legend ?? [];
+const unitNote = line?.unitNote || area?.unitNote || cols?.unitNote || "";
 const unitHead = spec.ok && spec.yUnit ? `${spec.y} (${spec.yUnit})` : spec.ok ? spec.y : "";
 const hasFoot = spec.ok && (spec.caption || spec.source);
 ---
@@ -58,9 +69,9 @@ const hasFoot = spec.ok && (spec.caption || spec.source);
 					</div>
 				)}
 
-				{line && line.unitNote && (
+				{unitNote && (
 					<p class="folio-line__unit" aria-hidden="true">
-						{line.unitNote}
+						{unitNote}
 					</p>
 				)}
 
@@ -85,6 +96,94 @@ const hasFoot = spec.ok && (spec.caption || spec.source);
 								<span class:list={[l.minor && "is-minor"]} style={`left:${l.percent}%`}>{l.label}</span>
 							))}
 						</div>
+					</div>
+				)}
+
+				{area && (
+					<div class="folio-line" role="img" aria-label={spec.alt}>
+						<div class="folio-line__y" aria-hidden="true">
+							{area.yTicks.map((t) => (
+								<span style={`top:${t.percent}%`}>{t.label}</span>
+							))}
+						</div>
+						<div class="folio-line__plot" aria-hidden="true">
+							<svg viewBox="0 0 1000 1000" preserveAspectRatio="none" focusable="false">
+								{area.yTicks.map((t) => (
+									<line class="folio-line__grid" x1="0" x2="1000" y1={t.percent * 10} y2={t.percent * 10} vector-effect="non-scaling-stroke" />
+								))}
+								{area.layers.map((l) => (
+									<polygon class="folio-area__fill" data-slot={l.slot} points={l.polygon} />
+								))}
+								{area.layers.map((l) => (
+									<polyline class="folio-line__path" data-slot={l.slot} points={l.line} vector-effect="non-scaling-stroke" />
+								))}
+							</svg>
+						</div>
+						<div class="folio-line__x" aria-hidden="true">
+							{area.xLabels.map((l) => (
+								<span class:list={[l.minor && "is-minor"]} style={`left:${l.percent}%`}>{l.label}</span>
+							))}
+						</div>
+					</div>
+				)}
+
+				{cols && (
+					<div class="folio-cols" role="img" aria-label={spec.alt}>
+						<div class="folio-line__y" aria-hidden="true">
+							{cols.yTicks.map((t) => (
+								<span style={`top:${t.percent}%`}>{t.label}</span>
+							))}
+						</div>
+						<div class="folio-cols__plot" aria-hidden="true">
+							{cols.yTicks.map((t) => (
+								<span class="folio-cols__grid" style={`top:${t.percent}%`} />
+							))}
+							{cols.columns.map((c) => (
+								<div class="folio-cols__col" style={`--folio-to:${c.percent}%`} title={`${c.label}: ${c.text}`}>
+									<span>{c.text}</span>
+								</div>
+							))}
+						</div>
+						<div class="folio-cols__x" aria-hidden="true">
+							{cols.columns.map((c) => (
+								<span>{c.label}</span>
+							))}
+						</div>
+					</div>
+				)}
+
+				{stack && (
+					<div class="folio-stack" role="img" aria-label={spec.alt}>
+						{stack.rows.map((r) => (
+							<div class="folio-stack__row" aria-hidden="true">
+								<span class="folio-stack__label">{r.label}</span>
+								<span class="folio-stack__bar" style={`--folio-to:${r.percent}%`}>
+									{r.segments.map((g) => (
+										<span class="folio-stack__seg" data-slot={g.slot} style={`--folio-w:${g.width}%`} title={`${g.series}: ${g.text}`} />
+									))}
+								</span>
+								{r.total && <span class="folio-stack__total">{r.total}</span>}
+							</div>
+						))}
+					</div>
+				)}
+
+				{compare && (
+					<div class="folio-dumb" role="img" aria-label={spec.alt}>
+						{compare.rows.map((r) => (
+							<div class="folio-dumb__row" aria-hidden="true">
+								<span class="folio-dumb__label">{r.label}</span>
+								<span class="folio-dumb__track">
+									<span class="folio-dumb__link" style={`--folio-from:${Math.min(r.from.at, r.to.at)}%;--folio-to:${Math.max(r.from.at, r.to.at)}%`} />
+									<span class="folio-dumb__dot" data-slot="6" style={`--folio-at:${r.from.at}%`}>
+										<b>{r.from.text}</b>
+									</span>
+									<span class="folio-dumb__dot" data-slot="1" style={`--folio-at:${r.to.at}%`}>
+										<b>{r.to.text}</b>
+									</span>
+								</span>
+							</div>
+						))}
 					</div>
 				)}
 

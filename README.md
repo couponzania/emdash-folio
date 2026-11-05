@@ -103,11 +103,13 @@ Review markup: `itemReviewed` (type and name), `reviewRating` (the overall score
 
 ### Chart (`folioChart`)
 
-Bar, line and donut charts from pasted data, drawn on the server by Folio itself (no chart library). Every chart carries its description for screen readers, a data table behind a "Data table" toggle, an optional note and a linked source.
+Bar, line, donut, column, stacked bar, area and comparison charts from pasted data, drawn on the server by Folio itself (no chart library). Every chart carries its description for screen readers, a data table behind a "Data table" toggle, an optional note and a linked source.
 
 | Field | Notes |
 |---|---|
 | Chart | **Bars** to compare or rank amounts (horizontal, so labels stay readable on phones; values from zero up), **Line** for change over time, **Donut** for parts of one whole (up to 6 slices, no negatives). |
+| More charts | **Columns** for a few periods (one series, up to 12). **Stacked bars** for parts of a whole across groups (a series column, up to 6 parts; "Stacked bars show" picks totals or 100% shares). **Area** for a total over time (a series column stacks up to 4; every series needs a value at every point). **Comparison** for before and after per row (a series column with exactly two values; rows sorted by the change). |
+| Stacked bars show | Totals (longer bars for bigger totals) or Shares (every bar 100%). Stacked bars only. |
 | Title | Shown above the chart. |
 | What it shows | Required. One sentence with the finding; screen readers read it as the chart. |
 | Data | CSV, tab separated (pasted from a spreadsheet) or semicolon separated. The first row names the columns. Values may carry thousands separators, a leading currency sign or a trailing %. Up to 500 rows. |

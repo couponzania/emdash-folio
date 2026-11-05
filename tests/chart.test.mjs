@@ -117,8 +117,8 @@ test("donutModel: shares under 10% keep one decimal", () => {
 	);
 });
 
-test("chartSpec: area charts are not offered", () => {
-	assert.equal(chartSpec(node({ kind: "area" })).reason, 'Unknown chart type "area".');
+test("chartSpec: unknown chart types are refused", () => {
+	assert.equal(chartSpec(node({ kind: "pie3d" })).reason, 'Unknown chart type "pie3d".');
 });
 
 test("formatValue: units as people write them", () => {

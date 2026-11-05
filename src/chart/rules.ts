@@ -4,7 +4,7 @@
 import { safeHref, text } from "../shared/fields.ts";
 import { parseGrid } from "../shared/grid.ts";
 
-export const CHART_KINDS = ["bar", "line", "donut"] as const;
+export const CHART_KINDS = ["bar", "line", "donut", "column", "stacked", "area", "compare"] as const;
 export type ChartKind = (typeof CHART_KINDS)[number];
 
 export const MAX_ROWS = 500;
@@ -28,6 +28,8 @@ export interface ChartSpec {
 	caption: string;
 	source?: { name: string; href?: string };
 	yUnit: string;
+	/** Stacked bars only: "share" draws every bar as 100%; otherwise bars keep their totals. */
+	stackMode: "total" | "share";
 }
 
 export interface ChartError {
@@ -49,7 +51,7 @@ export function toNumber(input: string): number | null {
 	return /^-?\d+(\.\d+)?$/.test(s) ? Number(s) : null;
 }
 
-const fail = (reason: string): ChartError => ({ ok: false, reason });
+export const fail = (reason: string): ChartError => ({ ok: false, reason });
 
 /** Reads and checks the block's fields. Never throws: a problem comes back as a reason. */
 export function chartSpec(node: Record<string, unknown>): ChartSpec | ChartError {
@@ -76,7 +78,7 @@ export function chartSpec(node: Record<string, unknown>): ChartSpec | ChartError
 	if (seriesName && !series) return fail(`No column named "${seriesName}" in the data.`);
 
 	const overTime = kind === "line";
-	const numericX = overTime && table.rows.every((r) => /^-?\d+(\.\d+)?$/.test(r[x]));
+	const numericX = (overTime || kind === "area") && table.rows.every((r) => /^-?\d+(\.\d+)?$/.test(r[x]));
 	const rows: ChartRow[] = [];
 	for (const [i, r] of table.rows.entries()) {
 		const raw = r[y];
@@ -104,6 +106,7 @@ export function chartSpec(node: Record<string, unknown>): ChartSpec | ChartError
 		caption: text(node.caption),
 		...(sourceName ? { source: { name: sourceName, ...(sourceHref ? { href: sourceHref } : {}) } } : {}),
 		yUnit: text(node.yUnit),
+		stackMode: text(node.stackMode) === "share" ? "share" : "total",
 	};
 }
 
@@ -171,7 +174,7 @@ export function donutModel(spec: ChartSpec): DonutModel | ChartError {
 	return { ok: true, total, slices, top };
 }
 
-const CURRENCY = new Set(["$", "₹", "€", "£", "¥"]);
+export const CURRENCY = new Set(["$", "₹", "€", "£", "¥"]);
 
 /** A value for display: thousands separators, at most two decimals, and the unit where people put it. */
 export function formatValue(n: number, unit: string): string {
@@ -182,7 +185,7 @@ export function formatValue(n: number, unit: string): string {
 	return `${s} ${unit}`;
 }
 
-const round = (n: number, places = 2) => {
+export const round = (n: number, places = 2) => {
 	const f = 10 ** places;
 	const r = Math.round(n * f) / f;
 	return Object.is(r, -0) ? 0 : r;
@@ -239,7 +242,7 @@ export function barModel(spec: ChartSpec): BarModel | ChartError {
 export const PHONE_LABEL_GAP = 25;
 
 /** Marks labels a phone can't fit: keep the first, then each one far enough from the last kept; the last always stays. */
-function phoneLabels(labels: Array<{ label: string; percent: number }>): Array<{ label: string; percent: number; minor: boolean }> {
+export function phoneLabels(labels: Array<{ label: string; percent: number }>): Array<{ label: string; percent: number; minor: boolean }> {
 	const out = labels.map((l) => ({ ...l, minor: true }));
 	let kept = -Infinity;
 	out.forEach((l, i) => {

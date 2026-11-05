@@ -1,0 +1,211 @@
+/* Folio chart types added in 0.6: columns, stacked bars, area, ranked comparison. */
+
+/* Default colour for each new mark; [data-slot] in folio.css overrides it (hence :where). */
+.folio :where(.folio-cols__col, .folio-stack__seg, .folio-dumb__dot, .folio-area__fill) {
+	--folio-c: var(--folio-series-1);
+}
+
+/* Charts: vertical columns */
+.folio .folio-cols {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: 14rem auto;
+	column-gap: 0.6rem;
+}
+
+.folio .folio-cols__plot {
+	position: relative;
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-around;
+	gap: 0.5rem;
+	border-bottom: 1px solid var(--folio-border-strong);
+}
+
+.folio .folio-cols__grid {
+	position: absolute;
+	right: 0;
+	left: 0;
+	height: 1px;
+	background: var(--folio-border);
+}
+
+.folio .folio-cols__col {
+	position: relative;
+	flex: 1 1 0;
+	max-width: 3.5rem;
+	height: var(--folio-to);
+	border-radius: 4px 4px 0 0;
+	background: var(--folio-c);
+}
+
+.folio .folio-cols__col span {
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	padding-bottom: 0.2rem;
+	transform: translateX(-50%);
+	font-size: 0.8rem;
+	font-weight: 600;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+.folio .folio-cols__x {
+	display: flex;
+	grid-column: 2;
+	justify-content: space-around;
+	gap: 0.5rem;
+	padding-top: 0.4rem;
+}
+
+.folio .folio-cols__x span {
+	flex: 1 1 0;
+	max-width: 3.5rem;
+	color: var(--folio-text-muted);
+	font-size: 0.78rem;
+	text-align: center;
+}
+
+/* Charts: stacked bars */
+.folio .folio-stack {
+	display: grid;
+	gap: 0.6rem;
+}
+
+.folio .folio-stack__row {
+	display: grid;
+	grid-template-columns: minmax(6rem, 30%) 1fr auto;
+	align-items: center;
+	gap: 0.85rem;
+	font-size: 0.9rem;
+}
+
+.folio .folio-stack__label {
+	color: var(--folio-text-2);
+}
+
+.folio .folio-stack__bar {
+	display: flex;
+	width: var(--folio-to, 100%);
+	height: 1.35rem;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.folio .folio-stack__seg {
+	width: var(--folio-w);
+	height: 100%;
+	background: var(--folio-c);
+	box-shadow: inset -1.5px 0 0 var(--folio-surface);
+}
+
+.folio .folio-stack__total {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Charts: ranked comparison (dumbbell) */
+.folio .folio-dumb {
+	display: grid;
+	gap: 0.85rem;
+}
+
+.folio .folio-dumb__row {
+	display: grid;
+	grid-template-columns: minmax(6rem, 30%) 1fr;
+	align-items: center;
+	gap: 0.85rem;
+	font-size: 0.9rem;
+}
+
+.folio .folio-dumb__label {
+	color: var(--folio-text-2);
+}
+
+.folio .folio-dumb__track {
+	position: relative;
+	height: 1.6rem;
+	margin: 0 1.75rem;
+}
+
+.folio .folio-dumb__track::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	right: 0;
+	left: 0;
+	height: 1px;
+	background: var(--folio-border);
+}
+
+.folio .folio-dumb__link {
+	position: absolute;
+	top: calc(50% - 2px);
+	left: var(--folio-from);
+	width: calc(var(--folio-to) - var(--folio-from));
+	height: 4px;
+	border-radius: 2px;
+	background: var(--folio-border-strong);
+}
+
+.folio .folio-dumb__dot {
+	position: absolute;
+	top: 50%;
+	left: var(--folio-at);
+	width: 0.85rem;
+	height: 0.85rem;
+	border: 2px solid var(--folio-surface);
+	border-radius: 50%;
+	background: var(--folio-c);
+	transform: translate(-50%, -50%);
+}
+
+.folio .folio-dumb__dot b {
+	position: absolute;
+	top: -1.25rem;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 0.78rem;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Charts: area (reuses the line chart frame) */
+.folio .folio-area__fill {
+	fill: var(--folio-c);
+	fill-opacity: 0.28;
+	stroke: none;
+}
+
+
+@media (max-width: 640px) {
+	.folio .folio-stack__row,
+	.folio .folio-dumb__row {
+		grid-template-columns: 1fr auto;
+		gap: 0.3rem 0.75rem;
+	}
+
+	.folio .folio-stack__bar,
+	.folio .folio-dumb__track {
+		grid-column: 1 / -1;
+		grid-row: 2;
+	}
+
+	.folio .folio-cols {
+		grid-template-rows: 11rem auto;
+	}
+}
+
+
+/* Ranked comparison: the first series' value sits under its dot, the second above, so close
+   values never collide. */
+.folio .folio-dumb__dot:nth-child(2) b {
+	top: auto;
+	bottom: -1.3rem;
+}
+
+.folio .folio-dumb__row {
+	min-height: 3.2rem;
+}
+

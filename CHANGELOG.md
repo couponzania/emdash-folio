@@ -2,6 +2,12 @@
 
 Every change to Folio gets an entry and a version bump (semver), released as a `v{version}` tag. The version lives in `package.json` and `FOLIO_VERSION` in `src/plugin.js`; a test fails if they or this file disagree.
 
+## 0.6.0 (2026-11-05)
+
+- Four new chart types in the chart block, drawn by Folio's own code like the others: **Columns** (`column`: vertical, one series, up to 12), **Stacked bars** (`stacked`: needs a series column, up to 6 parts; "Totals" keeps bar lengths, "Shares" draws every bar as 100%), **Area** (`area`: one area from zero, or up to 4 stacked by a series column; no gaps) and **Comparison** (`compare`: exactly two series, e.g. 2025 and 2026, as two dots per row on one scale, sorted by the change; the earlier value is grey). Each says why when the data doesn't fit.
+- New field **Stacked bars show** (`stackMode`).
+- Layout rules in `src/chart/more-rules.ts`, styles in `src/styles/charts-more.css`, all tested.
+
 ## 0.5.0 (2026-11-05)
 
 - Ten new blocks, all server rendered with fields: **TL;DR** (`folioTldr`), **Steps** (`folioSteps`), **Callout** (`folioCallout`: tip, warning, insight), **Metric cards** (`folioMetrics`), **Timeline** (`folioTimeline`), **Table** (`folioTable`), **Pros and cons** (`folioProsCons`), **Verdict** (`folioVerdict`), **Choose A or B** (`folioChoose`) and **Who it's for** (`folioAudience`). Layouts as approved in the 2026-11-05 mockup; phones get stacked cards, and the table turns each row into a card.
